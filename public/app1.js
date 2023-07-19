@@ -89,6 +89,6 @@ async function createTable() {
 }
 
  
-createTable();
+
 
  
