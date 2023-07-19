@@ -60,17 +60,18 @@
                             <p class='title'>Цены:</p>
                             ${htmlPrice}
                         </div>
-                    <div class='about'>
-                            <p class='title'>${v.brand || ''}</p>
-                            <p class='subtitle'>${v.name_taste || ''}</p>
-                            <p class="title">В наличии:</p>
-                            <p class="subtitle">${v.count_on_stock || ''}</p>
-                        </div>
                         <div class='counter'>
                             <div id='minus-${v.id}' class='btn'>-</div>
                             <div id='action-count' class='count'>0</div>
                             <div id='plus-${v.id}' class='btn btn-plus'>+</div>
                         </div>
+                        <div class='about'>
+                            <p class='title'>${v.brand || ''}</p>
+                            <p class='subtitle'>${v.name_taste || ''}</p>
+                            <p class="title">В наличии:</p>
+                            <p class="subtitle">${v.count_on_stock || ''}</p>
+                        </div>
+                        
                     </div>
                 </div>
         `);
@@ -97,7 +98,6 @@
         }
         return priceMap;
     }
-
 
     async function createTable() {
 
