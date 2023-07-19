@@ -15,16 +15,3 @@ export async function validateUser(request: Request, response: Response, next: N
     return response.status(400).send("Ресурс get не доступен.");
 }
 
-
-export async function postValidateUser(request: Request, response: Response, next: NextFunction) {
-
-    if (request.session && request.session.id) {
-        const validUser = await db.isRealUser(request.session.id);
-        if (validUser) {
-            return next(); 
-        } else {
-            request.session!.id = undefined;
-        }
-    }
-    return response.status(404).send("Ресурс post не доступен."); 
-}

@@ -27,10 +27,13 @@ class MainController {
     async getAssort(request: Request, response: Response) {
         const id = request.session!.id;
         if (id) {
-            const products = await db.getAllNotes();
-            const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
-            const responseAll: ResultAllProds = {paramId: id, allProducts: result};
-            return response.status(200).json(responseAll);
+            const validUser = await db.isRealUser(id);
+            if (validUser) {
+                const products = await db.getAllNotes();
+                const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
+                const responseAll: ResultAllProds = {paramId: id, allProducts: result};
+                return response.status(200).json(responseAll);
+            }
         }
         return response.status(400).send("Ресурс временно не доступен."); 
     }
