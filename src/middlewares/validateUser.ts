@@ -8,10 +8,8 @@ export async function validateUser(request: Request, response: Response, next: N
         const validUser = await db.isRealUser(id);
         if (validUser) {
             return next();     
-        } else {
-            request.session!.id = undefined;
         }
     }
-    return response.status(400).send("Ресурс get не доступен.");
+    return response.status(400).send("get Ресурс не доступен.");
 }
 

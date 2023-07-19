@@ -16,11 +16,11 @@ class MainController {
         const errors = myValidationResult(request);
          
         if (!errors.isEmpty()) {
-            response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
+            return response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
         } 
         const id = request.params.id;
         request.session!.id = id; 
-        response.status(200).render('index1', {layout: 'main1'}); 
+        return response.status(200).render('index1', {layout: 'main1'}); 
     }
 
 
@@ -34,10 +34,10 @@ class MainController {
                 const products = await db.getAllNotes();
                 const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
                 const responseAll: ResultAllProds = {paramId: id, allProducts: result};
-                response.status(200).json(responseAll);
+                return response.status(200).json(responseAll);
             }
         }
-        response.status(400).send(`Ресурс временно не доступен. ${debg}`); 
+        return response.status(400).send(`Ресурс временно не доступен. ${debg}`); 
     }
 }
 
