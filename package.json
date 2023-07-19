@@ -13,6 +13,7 @@
     "typescript": "^5.1.6"
   },
   "scripts": {
+    
     "dev:build": "tsc -w",
     "dev:debug": "yarn nodemon --inspect src/index.ts",
     "dev": "concurrently yarn:dev:*"
