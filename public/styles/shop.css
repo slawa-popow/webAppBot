@@ -7,11 +7,11 @@
 .header {
   width: 100%;
   background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
-  height: 30px;
+  height: 80px;
 }
 
 .header h4 {
-  padding: 6px;
+  margin-bottom: -20px;
   text-align: center;
   color: whitesmoke;
 }
@@ -20,17 +20,16 @@
 
 html {
   background-color: rgb(243, 243, 243);
-  
 }
 
 body {
   font-size: 0.97em;
   font-family: 'Roboto', sans-serif;
-  max-width: 98%;
-  min-height: 600px;
+  width: 98%;
   background-color: white;
   margin: 0 auto;
   margin-bottom: 50px;
+  border-radius: 20px;
   box-shadow:
  inset 0 0  0 2px rgb(255,255,255),
        0.3em 0.3em 1em rgba(0,0,0,0.3);
@@ -39,8 +38,7 @@ body {
 
 
  .content {
-  margin: 0 10px;
-  height: 100vh;
+  margin: 2px 0;
   display: flex;
   justify-content: start;
   align-items: flex-start;

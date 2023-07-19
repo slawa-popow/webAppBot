@@ -11,56 +11,80 @@ async function getDataPage() {
         return [null, null];
     }
 }
-getDataPage();
+ 
 /**
  * 
  * @param {Array} keys 
  * @param {Array} arrObjs 
  */
 async function getConcreteData(arrObjs) {
-    const divs = [];
 
     arrObjs.forEach((v, i) => {
-        const ticket = $("<div class='ticket'></div>");
-        const imgAreaTicket = $("<div class='img-area-ticket'></div>");
-        const dataAreaTicket = $("<div class='data-area-ticket'>");
-        const tasteAreaTicket = $("<div class='taste-area-ticket'>");
-        const priceAreaTicket = $("<div class='price-area-ticket'>");
+        const vprice = getPriceMap(v);
+        let htmlPrice = '';
+        if (vprice.length > 0) {
+            for (let [name, price] of vprice) {
+               htmlPrice += `<p class='subtitle'> <span class="from">${name} </span><span class="summa"> ${price}</span></p>`;
+            }
+        }
+        ticket = $(`
+        <div class="Cart-Container" id="cnt">
+        <div class="Header">
+            <p class="Heading">${v.id || '##'}</p>
+            <h3 class="Heading">${v.category || ''}</h3>
+        </div>
+        
+        <div class='Cart-Items'>
+            <div class='image-box'>
+                <img src=${v.photo || ''}>
+            </div>
+        
+            <div class='about'>
+                <p class='title'>Цены:</p>
+                ${htmlPrice}
+            </div>
 
-        const img = `<a href="#"><img src="${v.photo}"/></a>`;
-        imgAreaTicket.append(img);
+           <div class='about'>
+                <p class='title'>${v.brand || ''}</p>
+                <p class='subtitle'>${v.name_taste || ''}</p>
+                <p class="title">В наличии:</p>
+                <p class="subtitle">${v.count_on_stock || ''}</p>
+            </div>
 
-        const brand = v.brand || '';
-        const name_taste = v.name_taste || '';
-        const price_from_1to2 = v.price_from_1to2 || '';
-        const price_from_3to4 = v.price_from_3to4 || '';
-        const price_from_5to9 = v.price_from_5to9 || '';
-        const price_from_10to29 = v.price_from_10to29 || '';
-        const price_from_30to69 = v.price_from_30to69 || '';
-        const price_from_70to149 = v.price_from_70to149 || '';
-        const price_from_150 = v.price_from_150 || '';
+            <div class='counter'>
+                <div id='minus-${v.id}' class='btn'>-</div>
+                <div id='action-count' class='count'>0</div>
+                <div id='plus-${v.id}' class='btn btn-plus'>+</div>
+            </div>
+        </div>
 
-        dataAreaTicket.append(`<p>Бренд:</p> <p>${brand}</p>`);
-        tasteAreaTicket.append(`<p>Вкус:</p> <p>${name_taste}</p>`);
+    </div>
+        `);
 
-        priceAreaTicket.append(`<span>Цена от 1 до 2: ${price_from_1to2}</span>`);
-        priceAreaTicket.append(`<span>Цена от 3 до 4: ${price_from_3to4}</span>`);
-        priceAreaTicket.append(`<span>Цена от 5 до 9: ${price_from_5to9}</span>`);
-        priceAreaTicket.append(`<span>Цена от 10 до 29: ${price_from_10to29}</span>`);
-        priceAreaTicket.append(`<span>Цена от 30 до 69: ${price_from_30to69}</span>`);
-        priceAreaTicket.append(`<span>Цена от 70 до 149: ${price_from_70to149}</span>`);
-        priceAreaTicket.append(`<span>Цена от 150: ${price_from_150}</span>`);
-
-        ticket.append(imgAreaTicket);
-        ticket.append(dataAreaTicket);
-        ticket.append(tasteAreaTicket);
-        ticket.append(priceAreaTicket);
-
-        divs.push(ticket);
+        $('#cnt').append(ticket);
     });
 
-    return divs;
 } 
+
+function getPriceMap(obj) {
+    const keysMap = {
+            'price_from_1to2': 'от 1 до 2',
+            'price_from_3to4': 'от 3 до 4',
+            'price_from_5to9': 'от 5 до 9',
+            'price_from_10to29': 'от 10 до 29',
+            'price_from_30to69': 'от 30 до 69',
+            'price_from_70to149': 'от 70 до 149',
+            'price_from_150': 'от 150'
+    };
+    const priceMap = [];
+    for (let [k, v] of Object.entries(keysMap)) {
+        if (obj[k] !== 0) {
+          priceMap.push([v, obj[k] || '']);  
+        }
+    }
+    return priceMap;
+}
+
 
 async function createTable() {
     const [usid, allData] = await getDataPage()
@@ -69,37 +93,10 @@ async function createTable() {
     console.log(usid, allData);
     $('#usid').text(`Твой telegram id = ${usid}`);
 
-    
-    // const table = $('<table>');
-    // cell = `<a class="img-products" href="#"><img src="${v}"/></a>`
-    // const headerRow = $('<tr>');
-    // const nameRows = ['фото', 'бренд', 'характеристика', 'имя товара', 'имя вкуса', 'цены'];
-    const keys = [
-            'photo',
-            'brand',
-            'name_taste',
-            'price_from_1to2',
-            'price_from_3to4',
-            'price_from_5to9',
-            'price_from_10to29',
-            'price_from_30to69',
-            'price_from_70to149',
-            'price_from_150'
-        ];
-    const namesFrom = [
-            'от 1 до 2', 'от 3 до 4', 'от 5 до 9', 'от 10 до 29', 'от 30 до 69',
-            'от 70 до 149', 'от 150'  
-    ];
-    const entityData = await getConcreteData(allData); // array div's
-    
-    for (let entity of entityData) {
-        $('#cnt').append(entity);
-    }
-    
-    
+    await getConcreteData(allData); // array div's    
 }
 
 
-// createTable();
+createTable();
 
  
