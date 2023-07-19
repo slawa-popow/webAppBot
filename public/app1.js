@@ -2,10 +2,12 @@
 
 
 async function getDataPage() {
+    console.log('-axios-');
     const data = await axios.post('/assort');
+    console.log('after');
     const alls = data.data;
     if (Object.keys(alls).length === 2 ) {
-        console.log('-Ok-')
+       
        return [alls.paramId, alls.allProducts]
     } else {
         return [null, null];
