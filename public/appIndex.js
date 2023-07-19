@@ -28,42 +28,36 @@ async function getConcreteData(arrObjs) {
             }
         }
         ticket = $(`
-        <div class="Cart-Container" id="cnt">
-        <div class="Header">
-            <p class="Heading">${v.id || '##'}</p>
-            <h3 class="Heading">${v.category || ''}</h3>
-        </div>
-        
-        <div class='Cart-Items'>
-            <div class='image-box'>
-                <img src=${v.photo || ''}>
+            <div class="Cart-Container" id="cnt">
+            <div class="Header">
+                <p class="Heading">${v.id || '##'}</p>
+                <h3 class="Heading">${v.category || ''}</h3>
             </div>
-        
-            <div class='about'>
-                <p class='title'>Цены:</p>
-                ${htmlPrice}
+                <div class='Cart-Items'>
+                    <div class='image-box'>
+                        <img src=${v.photo || ''}>
+                    </div>
+                    <div class='about'>
+                        <p class='title'>Цены:</p>
+                        ${htmlPrice}
+                    </div>
+                <div class='about'>
+                        <p class='title'>${v.brand || ''}</p>
+                        <p class='subtitle'>${v.name_taste || ''}</p>
+                        <p class="title">В наличии:</p>
+                        <p class="subtitle">${v.count_on_stock || ''}</p>
+                    </div>
+                    <div class='counter'>
+                        <div id='minus-${v.id}' class='btn'>-</div>
+                        <div id='action-count' class='count'>0</div>
+                        <div id='plus-${v.id}' class='btn btn-plus'>+</div>
+                    </div>
+                </div>
             </div>
-
-           <div class='about'>
-                <p class='title'>${v.brand || ''}</p>
-                <p class='subtitle'>${v.name_taste || ''}</p>
-                <p class="title">В наличии:</p>
-                <p class="subtitle">${v.count_on_stock || ''}</p>
-            </div>
-
-            <div class='counter'>
-                <div id='minus-${v.id}' class='btn'>-</div>
-                <div id='action-count' class='count'>0</div>
-                <div id='plus-${v.id}' class='btn btn-plus'>+</div>
-            </div>
-        </div>
-
-    </div>
-        `);
+    `);
 
         $('#cnt').append(ticket);
     });
-
 } 
 
 function getPriceMap(obj) {
