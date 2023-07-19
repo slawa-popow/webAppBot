@@ -84,7 +84,7 @@ body {
  }
  .image-box {
   margin: 10px 0 5px 10px;
-  width: 150px;
+  width: 110px;
  }
 
  .image-box img {
@@ -93,18 +93,16 @@ body {
 
 
  .about{
-  width: 140px;
+  width: 120px;
   text-align: center;
  }
  .title {
-  padding-top: 2px;
-  line-height: 8px;
+  line-height: 2px;
   font-size: 16px;
   font-weight: 800;
   color: #202020;
  }
  .subtitle{
-  line-height: 18px;
   font-size: 14px;
   font-weight: 600;
   color: #909090;
@@ -112,8 +110,8 @@ body {
 
  .counter{
   margin: 10px 0;
-  width: 100px;
-  margin-left: 8px;
+  width: 120px;
+  margin-left: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
