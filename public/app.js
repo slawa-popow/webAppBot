@@ -5,7 +5,6 @@ async function getDataPage() {
     const data = await axios.post('/assort');
     const alls = data.data;
     if (Object.keys(alls).length === 2 ) {
-        console.log(alls.allProducts)
        return [alls.paramId, alls.allProducts]
     } else {
         return [null, null];
@@ -84,7 +83,6 @@ async function createTable() {
     const [usid, allData] = await getDataPage()
     if (!usid || !allData) 
         console.log('Empty data from server.')
-    console.log(usid, allData);
     $('#usid').text(`Твой telegram id = ${usid}`);
 
     await getConcreteData(allData); // array div's    
