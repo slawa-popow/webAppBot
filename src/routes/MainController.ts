@@ -37,7 +37,7 @@ class MainController {
                 return response.status(200).json(responseAll);
             }
         }
-        return response.status(400).json(`Ресурс временно не доступен. ${Object.entries(request.session!)}`); 
+        return response.status(400).send(`Ресурс временно не доступен. ${request.session!.id}`); 
     }
 }
 
