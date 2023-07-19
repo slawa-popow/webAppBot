@@ -12,7 +12,7 @@ export async function validateUser(request: Request, response: Response, next: N
             request.session!.id = undefined;
         }
     }
-    return response.status(400).send("Ресурс не доступен.");
+    return response.status(400).send("Ресурс get не доступен.");
 }
 
 
@@ -26,5 +26,5 @@ export async function postValidateUser(request: Request, response: Response, nex
             request.session!.id = undefined;
         }
     }
-    return response.status(404).send("Ресурс не доступен."); 
+    return response.status(404).send("Ресурс post не доступен."); 
 }
