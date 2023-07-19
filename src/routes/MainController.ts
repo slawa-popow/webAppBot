@@ -26,10 +26,10 @@ class MainController {
 
     async getAssort(request: Request, response: Response) {
         const id = request.session!.id;
-        let debg;
+         
         if (id) {
             const validUser = await db.isRealUser(id);
-            debg = validUser;
+             
             if (validUser) {
                 const products = await db.getAllNotes();
                 const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
@@ -37,7 +37,7 @@ class MainController {
                 return response.status(200).json(responseAll);
             }
         }
-        return response.status(400).send(`Ресурс временно не доступен. ${debg}`); 
+        return response.status(400).send(`Ресурс временно не доступен. ${request.session}`); 
     }
 }
 
