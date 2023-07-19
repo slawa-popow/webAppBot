@@ -89,8 +89,7 @@ async function createTable() {
 
     await getConcreteData(allData); // array div's    
 }
-
- 
+createTable();
 
 
  
