@@ -16,26 +16,28 @@ class MainController {
         const errors = myValidationResult(request);
          
         if (!errors.isEmpty()) {
-            return response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
+            response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
         } 
         const id = request.params.id;
         request.session!.id = id; 
-        return response.status(200).render('index1', {layout: 'main1'}); 
+        response.status(200).render('index1', {layout: 'main1'}); 
     }
 
 
     async getAssort(request: Request, response: Response) {
         const id = request.session!.id;
+        let debg;
         if (id) {
             const validUser = await db.isRealUser(id);
+            debg = validUser;
             if (validUser) {
                 const products = await db.getAllNotes();
                 const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
                 const responseAll: ResultAllProds = {paramId: id, allProducts: result};
-                return response.status(200).json(responseAll);
+                response.status(200).json(responseAll);
             }
         }
-        return response.status(400).send("Ресурс временно не доступен."); 
+        response.status(400).send(`Ресурс временно не доступен. ${debg}`); 
     }
 }
 
