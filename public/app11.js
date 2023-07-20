@@ -114,5 +114,8 @@ async function createTable() {
     
 }
 
+$( function() {
+    $( "#tabs" ).tabs();
+  } );
 
 createTable();

@@ -148,3 +148,9 @@ body {
   color: #0ba360;
   font-size: 1.1em;
  }
+
+
+ .settings-widget {
+  position: sticky;
+  top: 0;
+ }
