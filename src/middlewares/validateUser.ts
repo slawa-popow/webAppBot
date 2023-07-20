@@ -10,6 +10,19 @@ export async function validateUser(request: Request, response: Response, next: N
             return next();     
         }
     }
-    return response.status(400).send("get Ресурс не доступен.");
+    return response.status(404).send("Ресурс временно не доступен.");
+}
+
+
+export async function validUsr(request: Request, response: Response, next: NextFunction) {
+    console.log(request.session!.id) 
+    if (request.session) {
+        const id = request.session.id;
+        const validUser = await db.isRealUser(id);
+        if (validUser) {
+            return next();     
+        }
+    }
+    return response.status(404).send("Ресурс временно не доступен.");
 }
 

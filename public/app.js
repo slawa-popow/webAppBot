@@ -1,8 +1,53 @@
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
 
+
+/**
+ * очистить содержимое
+ * clearContent(document.getElementById('cnt'));
+ * @param {HTMLDivElement} container
+ * @returns {boolean} result cleaning
+ */
+function clearContent(container) {
+    try {
+        for (let domElem of Array.from(container.children)) {
+            container.removeChild(domElem);
+        }
+    } catch (e) { 
+        console.log('Error in clearContent() try/catch', e);
+        return false;
+    }
+    return true;
+}
+
+
+async function getCategory() {
+    const response = await axios.post(devURL+'getCategory', {})
+                                .catch( error => {
+                                    if (error.response) {
+                                        // Запрос был сделан, и сервер ответил кодом состояния, который
+                                        // выходит за пределы 2xx
+                                        console.log(error.response.data);
+                                        console.log(error.response.status);
+                                        console.log(error.response.headers);
+                                      } else if (error.request) {
+                                        // Запрос был сделан, но ответ не получен
+                                        // `error.request`- это экземпляр XMLHttpRequest в браузере и экземпляр
+                                        // http.ClientRequest в node.js
+                                        console.log(error.request);
+                                      } else {
+                                        // Произошло что-то при настройке запроса, вызвавшее ошибку
+                                        console.log('Error', error.message);
+                                      }
+                                      console.log(error.config);
+                                });
+    console.log(response.data);
+    return response.data.categories || [];
+}
+
+
 async function getDataPage() {
-    const data = await axios.post(prodURL+'assort');
+    const data = await axios.post(devURL+'assort');
     
     const alls = data.data;
     if (Object.keys(alls).length === 2 ) {
@@ -14,7 +59,6 @@ async function getDataPage() {
 
 /**
 * 
-* @param {Array} keys 
 * @param {Array} arrObjs 
 */
 async function getConcreteData(arrObjs) {
@@ -63,17 +107,17 @@ async function getConcreteData(arrObjs) {
 
         ((id, onStock)=>{
             
-            $( `#plus_${id}` ).on( "click", (e) => {
+            $( `#plus_${id}` ).on( "click", async (e) => {
                 console.log('plus ', e.target.id.split('_')[1]);
                 let currCnt = $(`#count_${id}`).text();
                 currCnt = ((+currCnt >= 0) && (+currCnt <= onStock)) ? (+currCnt) + 1 : currCnt;
                 $(`#count_${id}`).text(''+currCnt);
             });
-            $( `#minus_${id}` ).on( "click", (e) => {
+            $( `#minus_${id}` ).on( "click", async (e) => {
                 let currCnt = $(`#count_${id}`).text();
                 currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
                 $(`#count_${id}`).text(''+currCnt);
-                 
+                await getCategory();
             });
             
             
@@ -114,8 +158,20 @@ async function createTable() {
     
 }
 
-$( function() {
-    $( "#tabs" ).tabs({collapsible: true});
-  } );
+(async () => {
+    $( function() {
+        $( "#tabs" ).tabs({collapsible: true});
+      } );
+
+    const cats = await getCategory();
+    let sortCats = [...cats].sort();
+    if (cats.length > 0) {
+        $('#tabs-1').append(`${sortCats.map(v => {
+            return `<a class='resp-category' href="#"><button>${v}</button></a>`
+        })
+        .join('\n')}`);
+    }
+})();
+
 
 createTable();

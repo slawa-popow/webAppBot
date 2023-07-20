@@ -3,12 +3,13 @@ import { SomeDataBase } from "../types/SomeDataBase";
 import mysql from 'mysql';
 import { Pool, PoolConnection } from "mysql";
 import dotenv from 'dotenv';
-import { Product } from '../types/Product';
+import { Product, AllCategory } from '../types/Product';
 import { promisify } from 'util';
 // import { OkPacket } from '../types/OkPacket'
 
 interface Tables {
     products: string;
+    allprods: string;
 };
 
 dotenv.config();
@@ -20,7 +21,7 @@ class MysqlClient implements SomeDataBase {
     private DATABASE: string = process.env.DATABASE || '';
     private PASSWORD: string = process.env.PASSWORD || '';
     private protected: Pool | null = null;
-    table: Tables = {products: 'products_1'};
+    table: Tables = {products: 'products_1', allprods: 'Товары'};
 
     constructor() {
         this.initPool();
@@ -64,10 +65,32 @@ class MysqlClient implements SomeDataBase {
             });
         }
         return isOk;
-        
     }
 
-    // getNote<T>(id: string, note: T): T;
+    async getAllCategory(): Promise<AllCategory | null> {
+        try {
+            const connect = await this.getConnectionPool();
+            const promCon = promisify(connect.query).bind(connect);
+
+            const result =  await promCon(`SELECT DISTINCT Группы FROM ${this.table.allprods};`) as Record<string, string>[];
+            connect.commit();
+            connect.release();
+            let rows = result.map((v) => {
+                const value = Object.values(v);
+                if (value.length > 0) 
+                    return value[0];
+                return;
+            }) as string[];
+
+            return (rows.length > 0) ? {categories: [...rows]} : null;
+
+        } catch {
+            console.log('Error in MysqlClient->getAllCategory()->catch');
+        }
+        return null;
+    }
+
+
 
     async getAllNotes<T extends Product>(): Promise<T[] | null> {
         try {

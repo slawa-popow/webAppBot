@@ -33,3 +33,8 @@ export interface Product {
     orderStatus?: string;
 }
 
+
+export interface AllCategory {
+    categories: string[]
+}
+

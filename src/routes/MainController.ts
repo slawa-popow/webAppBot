@@ -12,7 +12,7 @@ interface ResultAllProds {
 
 class MainController {
 
-    getIndexPage(request: Request, response: Response) {
+    async getIndexPage(request: Request, response: Response) {
         const errors = myValidationResult(request);
          
         if (!errors.isEmpty()) {
@@ -24,9 +24,15 @@ class MainController {
     }
 
 
+    async getAllCategory(_request: Request, response: Response) {
+        const allCategory = await db.getAllCategory();
+        return response.status(200).json(allCategory);
+    }
+
+
     async getAssort(request: Request, response: Response) {
         const id = request.session!.id;
-         
+        
         if (id) {
             const validUser = await db.isRealUser(id);
              

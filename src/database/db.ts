@@ -1,4 +1,4 @@
-import { Product } from "../types/Product";
+import { Product, AllCategory } from "../types/Product";
 import { SomeDataBase } from "../types/SomeDataBase";
 import { mysqlClient } from "./MysqlClient";
 
@@ -26,31 +26,9 @@ class Db {
         return await this.client.isRealUser(tableName);
     }
 
-    // async getNoteById(id: string): Promise<Blog | null> {
-    //     return await this.client.getNoteById(id);
-    // }
-
-
-    // /**
-    //  * @param note Запись для записи в бд
-    //  * @returns Запись записанная в бд
-    //  */
-    // async createNote<T extends Blog> (note: T): Promise<T | null> {
-    //     return await this.client.createNote(note);
-    // }
-
-
-    // /**
-    //  * Операция PUT по id
-    //  * @param id индетификатор записи которую надо заменить 
-    //  * @param note запись для замены
-    //  * @returns измененная запсь
-    //  */
-    // async putNoteById<T extends Blog>(id: string, note: T): Promise<T | null> {
-    //     return await this.client.putNote(id, note);
-    // }
-
-
+    async getAllCategory(): Promise<AllCategory | null> {
+        return await this.client.getAllCategory();
+    }
 
 }
 
