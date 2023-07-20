@@ -155,14 +155,14 @@ body {
 
  .resp-category {
   display: block;
-  margin: 3px 0;
+  margin: 4px 0;
  }
 
  .resp-category button {
   width: 100%;
   box-shadow: 0 0 3px rgba(0,0,0,0.4); 
-  padding: 6px 10px;
-  font-size: 0.8em;
+  padding: 8px 10px;
+  font-size: 0.9em;
   font-weight: bold;
   color: #505050;
  }
@@ -171,8 +171,6 @@ body {
   width: 100%;
   position: fixed;
   top: 0;
-  max-height: 600px;
-  overflow-y: auto;
  } 
 
  .like {

@@ -117,7 +117,6 @@ async function getConcreteData(arrObjs) {
                 let currCnt = $(`#count_${id}`).text();
                 currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
                 $(`#count_${id}`).text(''+currCnt);
-                await getCategory();
             });
             
             

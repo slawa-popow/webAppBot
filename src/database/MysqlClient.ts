@@ -72,7 +72,7 @@ class MysqlClient implements SomeDataBase {
             const connect = await this.getConnectionPool();
             const promCon = promisify(connect.query).bind(connect);
 
-            const result =  await promCon(`SELECT DISTINCT Группы FROM ${this.table.allprods};`) as Record<string, string>[];
+            const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(Группы, "/", 1) FROM ${this.table.allprods};`) as Record<string, string>[];
             connect.commit();
             connect.release();
             let rows = result.map((v) => {
