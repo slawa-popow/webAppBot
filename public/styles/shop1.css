@@ -155,7 +155,7 @@ body {
   top: 0;
  } 
 
- #tabs-3 {
-  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+ .like {
+  background-image: linear-gradient(to top, #e6b980 0%, #eacda3 100%);
   color: #f7f7f7;
  }
