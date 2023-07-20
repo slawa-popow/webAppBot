@@ -2,7 +2,7 @@ const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
 
 async function getDataPage() {
-    const data = await axios.post(devURL+'assort');
+    const data = await axios.post(prodURL+'assort');
     
     const alls = data.data;
     if (Object.keys(alls).length === 2 ) {
