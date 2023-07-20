@@ -115,7 +115,7 @@ async function createTable() {
 }
 
 $( function() {
-    $( "#tabs" ).tabs();
+    $( "#tabs" ).tabs({collapsible: true});
   } );
 
 createTable();
