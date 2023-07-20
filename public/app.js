@@ -1,6 +1,6 @@
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
-
+const URL = prodURL;
 
 /**
  * очистить содержимое
@@ -22,7 +22,7 @@ function clearContent(container) {
 
 
 async function getCategory() {
-    const response = await axios.post(devURL+'getCategory', {})
+    const response = await axios.post(URL+'getCategory', {})
                                 .catch( error => {
                                     if (error.response) {
                                         // Запрос был сделан, и сервер ответил кодом состояния, который
@@ -47,7 +47,7 @@ async function getCategory() {
 
 
 async function getDataPage() {
-    const data = await axios.post(devURL+'assort');
+    const data = await axios.post(URL+'assort');
     
     const alls = data.data;
     if (Object.keys(alls).length === 2 ) {
