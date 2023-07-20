@@ -151,7 +151,7 @@ body {
 
 
  .settings-widget {
-  position: sticky;
+  position: fixed;
   top: 0;
  } 
 
