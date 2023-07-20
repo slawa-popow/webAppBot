@@ -154,3 +154,8 @@ body {
   position: sticky;
   top: 0;
  } 
+
+ #tabs-3 {
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  color: #f7f7f7;
+ }
