@@ -153,23 +153,36 @@ async function createTable() {
     $('#usid').text(`Твой telegram id = ${usid}`);
 
     await getConcreteData(allData); // array div's  
-    
-    
 }
 
-(async () => {
-    $( function() {
-        $( "#tabs" ).tabs({collapsible: true});
-      } );
+/**
+ * <a class='resp-category' href="#"><button>${v}</button></a>
+ */
 
+// akkordion #set-cats
+(async () => {
+    $(function() {
+        $( "#tabs" ).tabs({collapsible: true});
+    });
+
+   
     const cats = await getCategory();
     let sortCats = [...cats].sort();
     if (cats.length > 0) {
-        $('#tabs-1').append(`${sortCats.map(v => {
-            return `<a class='resp-category' href="#"><button>${v}</button></a>`
+        $('#set-cats').append(`${sortCats.map(v => {
+            return `
+            <h3>${v}</h3>
+            <div>
+              <p>Mauris mauris ante, blandit et, ultrices a, suscipit eget, quam. Integer ut neque.</p>
+            </div>
+            `;
         })
         .join('\n')}`);
     }
+
+    $( "#set-cats" ).accordion({
+        collapsible: true
+    }); 
 })();
 
 
