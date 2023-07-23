@@ -1,12 +1,17 @@
+import axios from "axios";
+import 'webpack-jquery-ui/interactions';
+import 'webpack-jquery-ui/widgets';
+import 'webpack-jquery-ui/effects';
+
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
-const URL = prodURL;
+const URL = devURL; 
 
 /**
  * очистить содержимое
  * clearContent(document.getElementById('cnt'));
  * @param {HTMLDivElement} container
- * @returns {boolean} result cleaning
+ * @returns {boolean} result cleaning 
  */
 function clearContent(container) {
     try {
@@ -44,7 +49,7 @@ async function getCategory() {
     console.log(response.data);
     return response.data.categories || [];
 }
-
+ 
 
 async function getDataPage() {
     const data = await axios.post(URL+'assort');
@@ -73,7 +78,7 @@ async function getConcreteData(arrObjs) {
         }
         const vid = v.id;
         const count_on_stock = +v.count_on_stock || 0;
-        ticket = $(`
+        const ticket = $(`
             <div class="Cart-Container" id="cnt">
             <div class="Header">
                 <p class="Heading">${vid || '##'}</p>
@@ -163,6 +168,9 @@ async function createTable() {
 (async () => {
     $(function() {
         $( "#tabs" ).tabs({collapsible: true});
+        $('#cnt').on("click", (e) => {
+            $('#tabs').tabs( "option", "active", 10 );
+        });
     });
 
    
