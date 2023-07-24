@@ -5,7 +5,7 @@ import 'webpack-jquery-ui/effects';
 
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
-const URL = prodURL; 
+const URL = prodURL;   
 
 /**
  * очистить содержимое
