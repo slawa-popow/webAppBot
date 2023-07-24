@@ -1,4 +1,4 @@
-import { Product, AllCategory } from "../types/Product";
+import { AllCategory } from "../types/Product";
 import { SomeDataBase } from "../types/SomeDataBase";
 import { mysqlClient } from "./MysqlClient";
 
@@ -16,9 +16,9 @@ class Db {
     /** 
      * @returns Все записи из базы
      */
-    async getAllNotes(): Promise<Product[] | null> {
-        const allNotes: Product[] | null = await this.client.getAllNotes();
-        return (allNotes) ? allNotes : null;
+    async getTenNotes<T>(): Promise<T[] | null> {
+        const allNotes = await this.client.getTenNotes<T>();
+        return (allNotes && Array.isArray(allNotes)) ? allNotes : null;
     }
 
 

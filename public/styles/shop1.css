@@ -83,11 +83,12 @@ body {
  }
  .image-box {
   margin: 10px 0 5px 10px;
-  width: 110px;
+  width: 150px;
  }
 
  .image-box img {
-  height: 180px;
+  max-height: 200px;
+  max-width: 170px;
  }
 
 
@@ -96,13 +97,12 @@ body {
   text-align: center;
  }
  .title {
-  line-height: 2px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
   color: #202020;
  }
  .subtitle{
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #909090;
  }
@@ -150,7 +150,7 @@ body {
  }
 
  #tabs a {
-   font-size: 1em;
+   font-size: 0.85em;
    text-align: center;
   }
 

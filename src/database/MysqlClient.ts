@@ -3,7 +3,7 @@ import { SomeDataBase } from "../types/SomeDataBase";
 import mysql from 'mysql';
 import { Pool, PoolConnection } from "mysql";
 import dotenv from 'dotenv';
-import { Product, AllCategory } from '../types/Product';
+import { AllCategory } from '../types/Product';
 import { promisify } from 'util';
 // import { OkPacket } from '../types/OkPacket'
 
@@ -71,8 +71,8 @@ class MysqlClient implements SomeDataBase {
         try {
             const connect = await this.getConnectionPool();
             const promCon = promisify(connect.query).bind(connect);
-
-            const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(Группы, "/", 1) FROM ${this.table.allprods};`) as Record<string, string>[];
+            const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(группы, "/", 1) 
+                                          FROM ${this.table.allprods};`) as Record<string, string>[];
             connect.commit();
             connect.release();
             let rows = result.map((v) => {
@@ -92,12 +92,19 @@ class MysqlClient implements SomeDataBase {
 
 
 
-    async getAllNotes<T extends Product>(): Promise<T[] | null> {
+    async getTenNotes<T>(): Promise<T[] | null> {
         try {
             const connect = await this.getConnectionPool();
             const promCon = promisify(connect.query).bind(connect);
 
-            const result =  await promCon(`SELECT * FROM ${this.table.products};`) as T[];
+            const result =  await promCon(`
+                SELECT * FROM ${this.table.allprods},
+                (SELECT ROUND((SELECT MAX(${this.table.allprods}.id) FROM ${this.table.allprods}) * rand()) as rnd 
+                FROM ${this.table.allprods} LIMIT 25) tmp
+                WHERE ${this.table.allprods}.id in (rnd)
+                ORDER BY id;
+            `) as T[];
+
             connect.commit();
             connect.release();
 
@@ -111,3 +118,21 @@ class MysqlClient implements SomeDataBase {
 }
 
 export const mysqlClient = new MysqlClient()
+
+
+
+
+
+/**
+ * const result =  await promCon(`SELECT DISTINCT группы FROM ${this.table.allprods};`) as Record<string, string>[];
+ * 
+ * const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(Группы, "/", 1) 
+ *                                FROM ${this.table.allprods};`) as Record<string, string>[];
+ * 
+ * ---------- 10 unique ----------------
+ SELECT * FROM `Товары`,
+(SELECT ROUND((SELECT MAX(`Товары`.id) FROM `Товары`) *rand()) as rnd 
+FROM `Товары` LIMIT 25) tmp
+WHERE `Товары`.id in (rnd)
+ORDER BY id
+ */

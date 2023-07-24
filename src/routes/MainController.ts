@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { db } from '../database/db';
 import { Product } from '../types/Product';
 import { myValidationResult } from '../customErrors/customErrField';
+import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
+import { ResultFromMySklad } from '../types/ResultFromMySklad';
 
 interface ResultAllProds {
     paramId: string | number;
@@ -20,7 +22,7 @@ class MainController {
         } 
         const id = request.params.id;
         request.session!.id = id; 
-        return response.status(200).render('index7', {layout: 'main7'});  
+        return response.status(200).render('index1', {layout: 'main1'});  
     }
 
 
@@ -30,15 +32,25 @@ class MainController {
     }
 
 
-    async getAssort(request: Request, response: Response) {
+
+    async getTenProd(request: Request, response: Response) {
         const id = request.session!.id;
         
         if (id) {
             const validUser = await db.isRealUser(id);
              
             if (validUser) {
-                const products = await db.getAllNotes();
+                const products = await db.getTenNotes<Product>();
+                
+
                 const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
+                if (result.length > 0) {
+                    for (let p of result) {
+                        const fromMySklad: ResultFromMySklad = await getImgSrcFromMySklad(p.uuid);
+                        p['фото'] = fromMySklad.img;
+                        p.variantsCount = fromMySklad.variantsCount;
+                    }
+                }
                 const responseAll: ResultAllProds = {paramId: id, allProducts: result};
                 return response.status(200).json(responseAll);
             }

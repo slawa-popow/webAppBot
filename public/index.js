@@ -5,7 +5,7 @@ import 'webpack-jquery-ui/effects';
 
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
-const URL = devURL; 
+const URL = prodURL; 
 
 /**
  * очистить содержимое
@@ -52,9 +52,10 @@ async function getCategory() {
  
 
 async function getDataPage() {
-    const data = await axios.post(URL+'assort');
+    const data = await axios.post(URL+'getTenProd');
     
     const alls = data.data;
+    console.log(alls);
     if (Object.keys(alls).length === 2 ) {
     return [alls.paramId, alls.allProducts];
     } else {
@@ -77,16 +78,16 @@ async function getConcreteData(arrObjs) {
             }
         }
         const vid = v.id;
-        const count_on_stock = +v.count_on_stock || 0;
+        const count_on_stock = +v.variantsCount || 0;
         const ticket = $(`
             <div class="Cart-Container" id="cnt">
             <div class="Header">
                 <p class="Heading">${vid || '##'}</p>
-                <h3 class="Heading">${v.category || ''}</h3>
+                <h3 class="Heading">${v['группы'] || ''}</h3>
             </div>
                 <div class='Cart-Items'>
                     <div class='image-box'>
-                        <img src=${v.photo || ''}>
+                        <img src=${v['фото'] || ''}>
                     </div>
                     <div class='about'>
                         <p class='title'>Цены:</p>
@@ -98,10 +99,9 @@ async function getConcreteData(arrObjs) {
                         <div id=plus_${vid} class='btn btn-plus'>+</div>
                     </div>
                     <div class='about'>
-                        <p class='title'>${v.brand || ''}</p>
-                        <p class='subtitle'>${v.name_taste || ''}</p>
+                        <p class='title'>${v['бренд'] || ''}</p>
                         <p class="title">В наличии:</p>
-                        <p class="subtitle">${v.count_on_stock || ''}</p>
+                        <p class="subtitle">${count_on_stock}</p>
                     </div>
                     
                 </div>
@@ -115,7 +115,7 @@ async function getConcreteData(arrObjs) {
             $( `#plus_${id}` ).on( "click", async (e) => {
                 console.log('plus ', e.target.id.split('_')[1]);
                 let currCnt = $(`#count_${id}`).text();
-                currCnt = ((+currCnt >= 0) && (+currCnt <= onStock)) ? (+currCnt) + 1 : currCnt;
+                currCnt = ((+currCnt >= 0) && (+currCnt < onStock)) ? (+currCnt) + 1 : currCnt;
                 $(`#count_${id}`).text(''+currCnt);
             });
             $( `#minus_${id}` ).on( "click", async (e) => {
@@ -133,13 +133,13 @@ async function getConcreteData(arrObjs) {
 function getPriceMap(obj) {
     // console.log(obj)
     const keysMap = {
-            'price_from_1to2': 'от 1 до 2',
-            'price_from_3to4': 'от 3 до 4',
-            'price_from_5to9': 'от 5 до 9',
-            'price_from_10to29': 'от 10 до 29',
-            'price_from_30to69': 'от 30 до 69',
-            'price_from_70to149': 'от 70 до 149',
-            'price_from_150': 'от 150'
+            'цена_от_1_до_2': 'от 1 до 2: ',
+            'цена_от_3_до_4': 'от 3 до 4: ',
+            'цена_от_5_до_9': 'от 5 до 9: ',
+            'цена_от_10_до_29': 'от 10 до 29: ',
+            'цена_от_30_до_69': 'от 30 до 69: ',
+            'цена_от_70_до_149': 'от 70 до 149: ',
+            'цена_от_150': 'от 150: '
     };
     const priceMap = [];
     for (let [k, v] of Object.entries(keysMap)) {
