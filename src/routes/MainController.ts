@@ -5,6 +5,7 @@ import { Product } from '../types/Product';
 import { myValidationResult } from '../customErrors/customErrField';
 import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
 import { ResultFromMySklad } from '../types/ResultFromMySklad';
+import { ReqAddToBasket } from '../types/ReqAddToBasket';
 
 interface ResultAllProds {
     paramId: string | number;
@@ -22,7 +23,16 @@ class MainController {
         } 
         const id = request.params.id;
         request.session!.id = id; 
-        return response.status(200).render('indexA', {layout: 'mainA'});  
+        return response.status(200).render('indexB', {layout: 'mainB'});  
+    }
+
+
+    async getUserId(request: Request, response: Response) {
+        const id: string = request.session!.id;
+        if (id) {
+            return response.status(200).json({usid: id});
+        }
+        return response.status(400).send('Страница временно не доступна.')
     }
 
 
@@ -31,6 +41,15 @@ class MainController {
         return response.status(200).json(allCategory);
     }
 
+
+    async addToBasket(request: Request, response: Response) {
+        const addProd: ReqAddToBasket = request.body;
+        if (addProd.userId && addProd.idProduct) {
+            const result = await db.addToBasket(addProd); 
+            return response.status(200).json(result);
+        }
+        return response.status(404).json({error: "<-- Error request -->"}); 
+    }
 
 
     async getTenProd(request: Request, response: Response) {

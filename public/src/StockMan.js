@@ -3,10 +3,9 @@
 
 export class StockMan {
 
-    finderMan = null;
-
     constructor(finderMan) {
         this.finderMan = finderMan;
+        this.vapee = null;
     }
 
     /**
@@ -33,4 +32,9 @@ export class StockMan {
         }
         throw new Error('\nError in StockMan->findByCharacteristics(): Not defined finderMan or empty characteristics array\n');
     }
+
+    async getCategory() {
+       return await this.finderMan.getCategory();
+    }
+
 }

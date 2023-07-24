@@ -7,7 +7,9 @@ const mainRouter = Router();
 
 mainRouter.get('/:id', validateUser, mainController.getIndexPage);
 mainRouter.post('/getCategory', validUsr, mainController.getAllCategory);
-mainRouter.post('/getTenProd', mainController.getTenProd)
+mainRouter.post('/getTenProd',validUsr, mainController.getTenProd);
+mainRouter.post('/getUsid',validUsr, mainController.getUserId);
+mainRouter.post('/addProductOnBasket', validUsr, mainController.addToBasket)
 
 
 export { mainRouter }

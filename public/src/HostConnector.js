@@ -2,32 +2,75 @@ import axios from "axios";
 
 export class HostConnector {
 
-    HOSTDEV = 'localhost:4011';
-
     api = {
-        getTenProd: '/getTenProd',
-        getFindByChars: '/getFindByCharacteristics',
-        addProduct: '/addProductOnBasket',
-        removeProduct: '/removeProductFromBasket',
-        clearBasket: '/clearBasket',
-        doOrder: '/doOrder',
-        returnToTg: '/returnToTelegram'
+        getCats: 'getCategory',
+        getUsId: 'getUsid',
+        getTenProd: 'getTenProd',
+        getFindByChars: 'getFindByCharacteristics',
+        addProductOnBasket: 'addProductOnBasket',
+        removeProductFromBasket: 'removeProductFromBasket',
+        clearBasket: 'clearBasket',
+        doOrder: 'doOrder',
+        returnToTg: 'returnToTelegram'
     }
     
-    constructor() {
-        this.host = this.HOSTDEV;
+    constructor(url) {
+        this.host = url;
     }
 
 
     /**
-     * Вернуть 10 карточек товаров
+     * Получить айди (корзину) юзера
+     */
+    async getUserId() {
+        try {
+            const url =  this.host + this.api.getUsId;
+            const resp = await axios.post(url, {});
+            
+            return resp.data;
+        } catch (e) { console.error('Error in HostConnector->getUserId() ', error); }
+       
+    }
+
+
+    /**
+     * Вернуть категории товаров
+     * @returns 
+     */
+    async getCategory() {
+        try {
+            const url =  this.host + this.api.getCats;
+            const response = await axios.post(url, {})
+            return response.data.categories || [];
+
+        } catch (error) { console.error('Error in FinderMan->getCategory()', error); } 
+        return null;
+    }
+
+
+    /**
+     * Добавить товар в корзину.
+     * @param {string | number} id 
+     */
+    async addProduct(usrerId, id) {
+        try {
+            const url = this.host + this.api.addProductOnBasket;
+            const resp = await axios.post(url, {userId: usrerId,idProduct: id});
+            return resp.data;
+
+        } catch (e) { console.error('Error in HostConnector->addProduct() ', error); }
+        return null;
+    }
+
+    /**
+     * Вернуть 25 карточек товаров
      * @returns {Array | null}
      */
     async getTenProducts() {
         try {
             const url = this.host + this.api.getTenProd;
-            const response = await axios.get(url);
-            // console.log(response);
+            const response = await axios.post(url, {});
+    
             return response.data;
         } catch (error) { console.error('Error in HostConnector->getTenProducts() ', error); }
         return null;

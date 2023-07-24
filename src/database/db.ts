@@ -1,4 +1,5 @@
-import { AllCategory } from "../types/Product";
+import { AllCategory, ErrorInsertInto, Product } from "../types/Product";
+import { ReqAddToBasket } from "../types/ReqAddToBasket";
 import { SomeDataBase } from "../types/SomeDataBase";
 import { mysqlClient } from "./MysqlClient";
 
@@ -19,6 +20,11 @@ class Db {
     async getTenNotes<T>(): Promise<T[] | null> {
         const allNotes = await this.client.getTenNotes<T>();
         return (allNotes && Array.isArray(allNotes)) ? allNotes : null;
+    }
+
+    async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
+        const result = await this.client.addToBasket(addProd);
+        return result;
     }
 
 

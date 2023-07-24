@@ -2,10 +2,9 @@
 
 export class FinderMan {
 
-    hc = null;
-
     constructor(hostConnector) {
         this.hc = hostConnector;
+        this.vapee = null;
     }
 
     /**
@@ -33,6 +32,20 @@ export class FinderMan {
                 throw new Error('HostConnector instance is null or undefined');
             return await this.hc.getFindByCharacters(pack); 
         } catch (error) { console.error('Error in FinderMan->getFindByCharacters()', error); }        
+        return null;
+    }
+
+
+    /**
+     * Вернуть категории товаров
+     * @returns 
+     */
+    async getCategory() {
+        try {
+            const response = await this.hc.getCategory();
+            return response;
+
+        } catch (error) { console.error('Error in FinderMan->getCategory()', error); } 
         return null;
     }
 }
