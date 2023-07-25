@@ -24,7 +24,7 @@ class MainController {
         const id = request.params.id;
         console.log('id getIndexPage: ', id);
         request.session!.id = id; 
-        return response.status(200).render('index99', {layout: 'main99'});  
+        return response.status(200).render('index99', {layout: 'main99'});   
     }
 
 

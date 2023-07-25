@@ -15,12 +15,13 @@ import bodyParser from 'body-parser';
 import cookieSession from 'cookie-session';
 import { engine } from 'express-handlebars';
 import { mainRouter } from './routes/mainRouter';
-// import { basketRouter } from './routes/basketRouter'; 
+ 
  
 dotenv.config();
 
 const app = express();
 
+app.use(cors({credentials: true}));
 app.use(express.static(path.join(__dirname, '../public'))); 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars'); 
@@ -31,9 +32,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieSession({ keys: ['cookiestr'], maxAge: 24 * 60 * 60 * 5000, httpOnly: true,}));
 app.use(bodyParser.urlencoded({extended: true}));  
-app.use(cors({credentials: true}));
 app.use('/', mainRouter);
-// app.use('/', basketRouter);
+
 
 const port = process.env.PORT;
 app.listen(port, () => { 
