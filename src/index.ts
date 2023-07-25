@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieSession({ keys: ['cookiestr'], maxAge: 24 * 60 * 60 * 5000, httpOnly: true,}));
 app.use(bodyParser.urlencoded({extended: true}));  
-app.use('/', mainRouter);
+app.use('/main', mainRouter);
 
 
 const port = process.env.PORT;
