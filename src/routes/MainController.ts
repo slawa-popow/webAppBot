@@ -22,13 +22,15 @@ class MainController {
             return response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
         } 
         const id = request.params.id;
+        console.log('id getIndexPage: ', id);
         request.session!.id = id; 
         return response.status(200).render('index99', {layout: 'main99'});  
     }
 
 
-    async getUserId(request: Request, response: Response) {
+    async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
+        console.log('id getUserId: ', id);
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
