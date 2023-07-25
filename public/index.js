@@ -11,7 +11,7 @@ import { TicketMan } from "./src/TicketMan";
 
 const prodURL = 'https://web-app-bot-five.vercel.app/'
 const devURL = '/';
-const URL = devURL;
+const URL = prodURL;
 
 (async () => {
     const hostConnector = new HostConnector(URL);
