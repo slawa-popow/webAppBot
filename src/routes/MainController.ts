@@ -23,7 +23,7 @@ class MainController {
         } 
         const id = request.params.id;
         request.session!.id = id; 
-        return response.status(200).render('index44', {layout: 'main44'});  
+        return response.status(200).render('index', {layout: 'main'});  
     }
 
 
