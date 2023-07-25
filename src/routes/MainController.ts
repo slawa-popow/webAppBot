@@ -5,6 +5,7 @@ import { Product } from '../types/Product';
 import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
 import { ResultFromMySklad } from '../types/ResultFromMySklad';
 import { ReqAddToBasket } from '../types/ReqAddToBasket';
+// import { CountAndImage } from '../types/CountAndImage';
 
 interface ResultAllProds {
     paramId: string | number;
@@ -69,23 +70,35 @@ class MainController {
              
             if (validUser) {
                 const products = await db.getTenNotes<Product>();
-                
-
                 const result = (products && products.some((v) => Object.keys(v).length > 0)) ? products: [];
-                if (result.length > 0) {
-                    for (let p of result) {
-                        const fromMySklad: ResultFromMySklad = await getImgSrcFromMySklad(p.uuid);
-                        p['фото'] = fromMySklad.img;
-                        p.variantsCount = fromMySklad.variantsCount;
-                    }
-                }
+                
                 const responseAll: ResultAllProds = {paramId: id, allProducts: result};
                 return response.status(200).json(responseAll);
             }
         }
         return response.status(400).send(`Ресурс временно не доступен. ${request.session!.id}`); 
     }
+
+    // ------------------------- ------------- ---------------- --------------------------------------
+
+    async fromMySklad(_request: Request, response: Response) {
+        const uuids = await db.getUuids();
+        const X = [];
+        for (let i of uuids) {
+            const fromMySklad: ResultFromMySklad = await getImgSrcFromMySklad(i.uuid);
+            const img = fromMySklad.img;
+            const count = fromMySklad.variantsCount;
+            const res = [i.id, img, count] as string[];//{id: i.id, img: img, variantsCount: count};
+            console.log(res);
+            X.push(res);
+        }
+        const res = await db.setImageCount(X);
+
+        return response.send(res);
+    }
 }
 
+// id: 100,
+// uuid: 'fb75b0f6-d180-11ed-0a80-0f0a00262ea9'
 
 export const mainController = new MainController();

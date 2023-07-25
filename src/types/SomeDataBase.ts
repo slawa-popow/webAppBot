@@ -11,4 +11,7 @@ export interface SomeDataBase {
     addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto>;
     removeFromBasket(removeProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto>;
     getBasketInfo(usid: string): Promise<Product[]>;
+
+    getUuids(): Promise<Product[]>;
+    setImageCount(X: string[][]): Promise<boolean>;
 }

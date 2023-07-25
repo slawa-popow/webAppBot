@@ -50,6 +50,17 @@ class Db {
         return await this.client.getAllCategory();
     }
 
+    // выбрать uuid, primary_id
+    async getUuids(): Promise<Product[]> {
+        const result = await this.client.getUuids();
+        return result;
+    }
+
+    async setImageCount(X: string[][]): Promise<boolean> {
+        const res = await this.client.setImageCount(X);
+        return res;
+    }
+
 }
 
 export const db = new Db(mysqlClient);

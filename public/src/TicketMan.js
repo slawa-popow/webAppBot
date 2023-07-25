@@ -99,7 +99,7 @@ export class TicketMan {
                 }
             }
             const vid = v.id;
-            const count_on_stock = +v.variantsCount || 0;
+            const count_on_stock = +v['количество_на_складе'] || 0;
             const ticket = $(`
                 <div class="Cart-Container" id="cnt">
                 <div class="Header">
@@ -151,6 +151,7 @@ export class TicketMan {
                     currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
                     $(`#count_${id}`).text(''+currCnt);
                     const userId = this.vapee.userId;
+                    console.log('minus ', id);
                     const response = await this.vapee.basketMan.removeProduct(userId, id);
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
