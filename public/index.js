@@ -27,7 +27,7 @@ const URL = prodURL;
         hostConnector 
     );
     
-    await vapee.init();
+    await vapee.init(); 
 
 })();
 

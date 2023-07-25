@@ -47,7 +47,7 @@ class MainController {
             const result = await db.addToBasket(addProd); 
             return response.status(200).json(result);
         }
-        return response.status(404).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."}); 
+        return response.status(404).json({error: "add product: server error"}); 
     }
 
 
@@ -57,7 +57,7 @@ class MainController {
             const result = await db.removeFromBasket(addProd); 
             return response.status(200).json(result);
         }
-        return response.status(404).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
+        return response.status(404).json({error: "remove product: server error"});
     }
 
 
