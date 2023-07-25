@@ -24,9 +24,7 @@ export async function validUsr(request: Request, response: Response, next: NextF
         const validUser = await db.isRealUser(id); 
         if (validUser) {
             return next();     
-        } else {
-            request.session = undefined;
-        }
+        } 
     }
     return response.status(400).json({error: "<-- Ресурс временно не доступен -->"}); 
 }
