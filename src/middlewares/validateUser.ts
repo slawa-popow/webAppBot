@@ -12,7 +12,7 @@ export async function validateUser(request: Request, response: Response, next: N
             return next();     
         }
     }
-    return response.status(400).json({error: "Корзина очищена", message: "Скорее всего Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
+    return response.status(404).json({error: "Корзина очищена", message: "Скорее всего Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
 }
 
 
@@ -25,6 +25,6 @@ export async function validUsr(request: Request, response: Response, next: NextF
             return next();     
         } 
     }
-    return response.status(400).json({error: "Корзина очищена", message: "Скорее всего Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."}); 
+    return response.status(404).json({error: "Корзина очищена", message: "Скорее всего Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."}); 
 }
 

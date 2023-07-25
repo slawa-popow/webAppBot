@@ -18,7 +18,7 @@ export class BasketMan {
     }
 
 
-    async removeProduct(userId, id) {
+    async removeProduct(userId, id) { 
         const result = await this.hc.removeProduct(userId, id);
         return this.operatiopWithProdusts(result);
     }

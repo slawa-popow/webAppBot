@@ -155,6 +155,7 @@ export class TicketMan {
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
                     } else {
+                        console.log(response);
                         this.clearContent(response);
                     }
                 });
