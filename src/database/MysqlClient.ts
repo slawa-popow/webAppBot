@@ -101,6 +101,33 @@ class MysqlClient implements SomeDataBase {
     }
 
 
+    /**
+     * Вернуть корзину с данными клиента
+     * @param usid id telegram user
+     * @returns 
+     */
+    async getBasketInfo(usid: string): Promise<Product[]> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+
+        try {
+            const basket = await promCon(`SELECT * FROM ${usid};`) as Product[];
+            return basket;
+
+        } catch (e) { console.log('Error in MysqlClient->agetBasketInfo()->catch', e) }
+        finally {
+            connect.commit();
+            connect.release();
+        }
+        return [];
+    }
+
+
+    /**
+     * Добавить товар в корзину по айди
+     * @param addProd данные об товаре из фронта
+     * @returns 
+     */
     async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
@@ -123,13 +150,35 @@ class MysqlClient implements SomeDataBase {
                 return basket;
             }
 
-        } catch (e) { console.log('Error in MysqlClient->addToBasket()->catch', e) }
+        } catch (e) { console.log('Error in MysqlClient->addToBasket()->catch', e) } 
         finally {
             connect.commit();
             connect.release();
         }
         
         return {error: ['addToBasket -> Ошибка данных.']};
+    }
+
+
+    /**
+     * Убрать товар из корзины по айди
+     * @param addProd данные об товаре из фронта
+     * @returns 
+     */
+    async removeFromBasket(removeProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+        try {
+            await promCon(`DELETE FROM ${removeProd.userId} WHERE uniq_token=${removeProd.idProduct} LIMIT 1;`) as OkPacket;
+            const basket = await promCon(`SELECT * FROM ${removeProd.userId};`) as Product[];
+            return basket; 
+        } catch (e) { console.log('Error in MysqlClient->removeFromBasket()->catch', e) } 
+        finally {
+            connect.commit();
+            connect.release();
+        }
+        
+        return {error: ['removeFromBasket -> Ошибка данных.']};
     }
 
 

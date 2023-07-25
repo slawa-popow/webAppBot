@@ -22,13 +22,27 @@ export class Vapee {
     }
 
     async init() {
-        this.userId = await this.getUsId();
-        await this.ticketMan.makeStartContent();
+        const userId = await this.getUsId();
+        if (userId) {
+            this.userId = userId;
+            const tenProd = await this.stockMan.getTenProducts();
+            this.ticketMan.setData(tenProd);
+            await this.ticketMan.viewStartProducts();
+        }
     }
 
     async getUsId() {
-        const respUsrId = await this.hc.getUserId();
-        return respUsrId.usid;
+        const result = await this.hc.getUserId();
+        const usid = result.usid;
+        if (usid) {
+            if (Array.isArray(result.basket)) {
+                this.basketMan.userBasket.push(...result.basket);
+            }
+            return usid;
+        }
+        
+        this.ticketMan.clearContent(result);
+        return null;
     }
 
 }

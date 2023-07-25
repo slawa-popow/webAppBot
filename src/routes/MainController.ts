@@ -30,9 +30,10 @@ class MainController {
     async getUserId(request: Request, response: Response) {
         const id: string = request.session!.id;
         if (id) {
-            return response.status(200).json({usid: id});
+            const basket: Product[] = await db.getBasketInfo(id);
+            return response.status(200).json({usid: id, basket: [...basket]});
         }
-        return response.status(400).send('Страница временно не доступна.')
+        return response.status(400).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
     }
 
 
@@ -42,13 +43,23 @@ class MainController {
     }
 
 
-    async addToBasket(request: Request, response: Response) {
+    async addToBasket(request: Request, response: Response) { 
         const addProd: ReqAddToBasket = request.body;
         if (addProd.userId && addProd.idProduct) {
             const result = await db.addToBasket(addProd); 
             return response.status(200).json(result);
         }
-        return response.status(404).json({error: "<-- Error request -->"}); 
+        return response.status(404).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."}); 
+    }
+
+
+    async removeFromBasket(request: Request, response: Response) {
+        const addProd: ReqAddToBasket = request.body;
+        if (addProd.userId && addProd.idProduct) {
+            const result = await db.removeFromBasket(addProd); 
+            return response.status(200).json(result);
+        }
+        return response.status(404).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
     }
 
 

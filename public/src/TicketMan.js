@@ -6,38 +6,24 @@ export class TicketMan {
     constructor(hostConnector) {
         this.hc = hostConnector;
         this.vapee = null;
+        this.bucket = null; // Временное хранилище для выборок 
     }
 
 
-    clearContent() {
-        try {
-            for (let domElem of Array.from(this.container.children)) {
-                this.container.removeChild(domElem);
-            }
-        } catch (e) { 
-            console.log('Error in clearContent() try/catch', e);
-            return false;
-        }
-        return true;
-    }
 
+    setData(data) {
+        if (this.bucket)
+            this.bucket = undefined;
+        this.bucket = data;
+    }
 
     /**
-     * Наполнить страницу
-     * @param {Array} categories 
-     */
-    async makeStartContent() {
-        await this.viewStartProducts();
-    }
-
-
-    /**
-     * Получить рандомные 25 продуктов
+     * Получить рандомные 10 продуктов
      * @returns 
      */
     async  getTenProds() {
         try {
-            const data = await this.hc.getTenProducts();
+            const data = this.bucket;
             
             if (Object.keys(data).length === 2 ) {
                 return [data.paramId, data.allProducts];
@@ -50,7 +36,8 @@ export class TicketMan {
 
 
     /**
-     * Показать первые 25 карточек. Стартует первой.
+     * Показать первые 10 карточек. Стартует первой.
+     * 
      */
     async viewStartProducts() {
         const [usid, allData] = await this.getTenProds();
@@ -59,7 +46,7 @@ export class TicketMan {
             return;
         }
         $('#usid').text(`Твой telegram id = ${usid}`);
-
+        $('#count-basket').text(`в корзине: ${this.vapee.basketMan.userBasket.length }`);
         await this.makeProductTickets(allData); // array div's 
         await this.makeTab(); 
     }
@@ -74,6 +61,7 @@ export class TicketMan {
         $('#cnt').on("click", (e) => {
             $('#tabs').tabs( "option", "active", 10 );
         });
+        
 
         const cats = await this.hc.getCategory();
         let sortCats = [...cats].sort();
@@ -92,6 +80,8 @@ export class TicketMan {
         $( "#set-cats" ).accordion({
             collapsible: true
         }); 
+         
+        
     }
 
 
@@ -153,13 +143,20 @@ export class TicketMan {
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
                     } else {
-                        $('#count-basket').text(response.error || 'ошибка');
+                        this.clearContent(response);
                     }
                 });
                 $( `#minus_${id}` ).on( "click", async (e) => {
                     let currCnt = $(`#count_${id}`).text();
                     currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
                     $(`#count_${id}`).text(''+currCnt);
+                    const userId = this.vapee.userId;
+                    const response = await this.vapee.basketMan.removeProduct(userId, id);
+                    if (Array.isArray(response)) {
+                        $('#count-basket').text(`в корзине: ${response.length}`);
+                    } else {
+                        this.clearContent(response);
+                    }
                 });
                 
                 
@@ -168,7 +165,23 @@ export class TicketMan {
         }
     }
     
-    
+    /**
+     * Если корзина удалени, очистить контент сообщить об 
+     * необходимиости перейти в телеграм
+     * @param {Response Error Message} respError объект ошибки с сервера 
+     *  {error: string, message: string} 
+     */
+    clearContent(respError) {
+        $('#count-basket').text(respError.error || 'ошибка');
+        ($('#cnt')).remove();
+        ($('#tabs-3-cnt')).remove();
+        ($('#tabs-3')).append(`<div id="tabs-3-cnt"><p>${respError.message}</p></div>`); 
+
+        ($('#tabs-1-cnt')).remove();
+        ($('#tabs-1')).append(`<div id="tabs-1-cnt"><p>${respError.message}</p></div>`); 
+    }
+
+
     /**
      * Создать карту цен для вывода и отфильтровать
      * нулевые цены.

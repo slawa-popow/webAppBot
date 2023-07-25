@@ -22,16 +22,30 @@ class Db {
         return (allNotes && Array.isArray(allNotes)) ? allNotes : null;
     }
 
+    // добавить в корзину
     async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
         const result = await this.client.addToBasket(addProd);
         return result;
     }
 
+    // Убрать из корзины
+    async removeFromBasket(removeProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
+        const result = await this.client.removeFromBasket(removeProd);
+        return result;
+    }
 
+    // вернуть корзину 
+    async getBasketInfo(usid: string): Promise<Product[]> {
+        const result = await this.client.getBasketInfo(usid);
+        return result;
+    }
+
+    // проверка юзера
     async isRealUser(tableName: string): Promise<boolean> {
         return await this.client.isRealUser(tableName);
     }
 
+    // вернуть все категории
     async getAllCategory(): Promise<AllCategory | null> {
         return await this.client.getAllCategory();
     }

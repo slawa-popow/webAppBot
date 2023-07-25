@@ -28,7 +28,10 @@ export class HostConnector {
             const resp = await axios.post(url, {});
             
             return resp.data;
-        } catch (e) { console.error('Error in HostConnector->getUserId() ', error); }
+        } catch (e) {
+            console.error('Error in HostConnector->getUserId() ', error);
+            return(e.response.data);
+        }
        
     }
 
@@ -52,15 +55,31 @@ export class HostConnector {
      * Добавить товар в корзину.
      * @param {string | number} id 
      */
-    async addProduct(usrerId, id) {
+    async addProduct(userId, id) {
         try {
             const url = this.host + this.api.addProductOnBasket;
-            const resp = await axios.post(url, {userId: usrerId,idProduct: id});
+            const resp = await axios.post(url, {userId: userId,idProduct: id});
             return resp.data;
 
-        } catch (e) { console.error('Error in HostConnector->addProduct() ', error); }
-        return null;
+        } catch (e) { 
+            console.log('Error in HostConnector->addProduct() ', e); 
+            return(e.response.data);
+        }
     }
+
+
+    async removeProduct(userId, id) {
+        try {
+            const url = this.host + this.api.removeProductFromBasket;
+            const resp = await axios.post(url, {userId: userId,idProduct: id});
+            return resp.data;
+
+        } catch (e) { 
+            console.log('Error in HostConnector->removeProduct() ', e); 
+            return(e.response.data);
+        }
+    }
+
 
     /**
      * Вернуть 25 карточек товаров

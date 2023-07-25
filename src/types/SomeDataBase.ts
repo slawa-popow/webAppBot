@@ -9,5 +9,6 @@ export interface SomeDataBase {
     isRealUser(tableName: string): Promise<boolean>;
     getAllCategory(): Promise<AllCategory | null>;
     addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto>;
-    
+    removeFromBasket(removeProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto>;
+    getBasketInfo(usid: string): Promise<Product[]>;
 }
