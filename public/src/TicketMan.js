@@ -144,7 +144,7 @@ export class TicketMan {
                         $('#count-basket').text(`в корзине: ${response.length}`);
                     } else {
                         this.clearContent(response);
-                    }
+                    } 
                 });
                 $( `#minus_${id}` ).on( "click", async (e) => {
                     let currCnt = $(`#count_${id}`).text();

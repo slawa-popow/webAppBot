@@ -24,7 +24,7 @@ const URL = prodURL;
         stockMan,
         basketMan,
         ticketMan,
-        hostConnector
+        hostConnector 
     );
     
     await vapee.init();

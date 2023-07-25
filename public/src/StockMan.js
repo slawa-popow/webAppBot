@@ -10,7 +10,7 @@ export class StockMan {
 
     /**
      * Вернуть 10 карточек товаров
-     * @returns {[{}] | null}
+     * @returns {[{}] | null} 
      */
     async getTenProducts() {
         if (!this.finderMan) {

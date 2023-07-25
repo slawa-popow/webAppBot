@@ -60,7 +60,7 @@ export class HostConnector {
             const url = this.host + this.api.addProductOnBasket;
             const resp = await axios.post(url, {userId: userId,idProduct: id});
             return resp.data;
-
+ 
         } catch (e) { 
             console.log('Error in HostConnector->addProduct() ', e); 
             return(e.response.data);

@@ -15,7 +15,7 @@ export class Vapee {
         this.basketMan = basketMan;
         this.ticketMan = ticketMan;
         this.hc = hostConnector;
-        this.stockMan.vapee = this;
+        this.stockMan.vapee = this; 
         this.basketMan.vapee = this;
         this.ticketMan.vapee = this;
         
