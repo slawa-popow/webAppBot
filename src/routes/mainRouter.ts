@@ -8,7 +8,7 @@ const mainRouter = Router();
 mainRouter.get('/:id', mainController.getIndexPage);
 mainRouter.post('/getCategory', mainController.getAllCategory);
 mainRouter.post('/getTenProd', mainController.getTenProd);
-mainRouter.post('/getUsid', mainController.getUserId);
+mainRouter.post('/getUsid', mainController.getUserId); 
 mainRouter.post('/addProductOnBasket', mainController.addToBasket)
 mainRouter.post('/removeProductFromBasket', mainController.removeFromBasket)
 
