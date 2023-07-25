@@ -2,15 +2,14 @@
 import { Request, Response, NextFunction } from "express";
 import { db } from '../database/db';
 
-export async function validateUser(request: Request, response: Response, next: NextFunction) {
-    console.log('validateUser: ', request.session!.id) 
-    const id = request.params.id;
-    if (id) {
+export async function validateUser(request: Request, response: Response, next: NextFunction) { 
+    const requery = request.query;
+     
+    if (requery && requery.usid) {
+        const id = requery.usid as string;
         const validUser = await db.isRealUser(id);
         if (validUser) {
             return next();     
-        } else {
-            request.session = undefined;
         }
     }
     return response.status(400).json({error: "<-- Ресурс временно не доступен -->"});
@@ -18,7 +17,7 @@ export async function validateUser(request: Request, response: Response, next: N
 
 
 export async function validUsr(request: Request, response: Response, next: NextFunction) {
-    console.log('validUsr: ', request.session!.id) 
+    console.log('valid post session.id: ', request.session!.id) 
     if (request.session) {
         const id = request.session.id;
         const validUser = await db.isRealUser(id); 

@@ -21,8 +21,8 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({credentials: true}));
 app.use(express.static(path.join(__dirname, '../public'))); 
+app.use(cors({credentials: true}));
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars'); 
 app.set('views', __dirname + '/../views');
@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieSession({ keys: ['cookiestr'], maxAge: 24 * 60 * 60 * 5000, httpOnly: true,}));
 app.use(bodyParser.urlencoded({extended: true}));  
-app.use('/main', mainRouter);
+app.use('/', mainRouter); //https://web-app-bot-b.vercel.app/?usid=User_{usid}
 
 
 const port = process.env.PORT;

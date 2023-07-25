@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import 'webpack-jquery-ui/interactions';
 import 'webpack-jquery-ui/widgets';
 import 'webpack-jquery-ui/effects';

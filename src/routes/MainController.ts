@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 // import dotenv from 'dotenv';
 import { db } from '../database/db';
 import { Product } from '../types/Product';
-import { myValidationResult } from '../customErrors/customErrField';
 import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
 import { ResultFromMySklad } from '../types/ResultFromMySklad';
 import { ReqAddToBasket } from '../types/ReqAddToBasket';
@@ -16,21 +15,18 @@ interface ResultAllProds {
 class MainController {
 
     async getIndexPage(request: Request, response: Response) {
-        const errors = myValidationResult(request);
-         
-        if (!errors.isEmpty()) {
-            return response.status(400).json( { errorsMessages: errors.array({onlyFirstError: true}) } ); 
-        } 
-        const id = request.params.id;
+        const requery = request.query;
+        const id = requery.usid;
         console.log('id getIndexPage: ', id);
-        request.session!.id = id; 
+        if (request.session)
+            request.session.id = id; 
         return response.status(200).render('index99', {layout: 'main99'});  
     }
 
 
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
-        console.log('id getUserId: ', id);
+        console.log('id sesion: ', id);
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
