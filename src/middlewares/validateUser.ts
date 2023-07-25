@@ -28,6 +28,6 @@ export async function validUsr(request: Request, response: Response, next: NextF
             request.session = undefined;
         }
     }
-    return response.status(400).json({error: "<-- Ресурс временно не доступен -->"});
+    return response.status(400).json({error: "<-- Ресурс временно не доступен -->"}); 
 }
 
