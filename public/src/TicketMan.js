@@ -62,6 +62,8 @@ export class TicketMan {
             $('#tabs').tabs( "option", "active", 10 );
         });
         
+// query_id=AAHrOrtzAAAAAOs6u3On2cDm&user=%7B%22id%22%3A1941650155%2C%22first_name%22%3A%22Slava%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22Pwg90%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1690386445&hash=268489f1c090ca1c40483be3ea489cdf77fba5c618b6c5fe2c29910a1a5ffe15
+
 
         const cats = await this.hc.getCategory();
         let sortCats = [...cats].sort();

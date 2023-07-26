@@ -17,6 +17,7 @@ class MainController {
 
     async getIndexPage(request: Request, response: Response) {
         const requery = request.query;
+        console.log(request.params, request.query);
         const id = requery.usid;
         console.log('id getIndexPage: ', id);
         if (request.session)
