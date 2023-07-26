@@ -37,5 +37,5 @@ app.use('/', mainRouter); //https://web-app-bot-b.vercel.app/?usid=User_{usid}
 
 const port = process.env.PORT;
 app.listen(port, () => { 
-  console.log(`\nRunning App at localhost:${port}\n`); 
+  console.log(`\nRunning App at localhost:${port}\n`);
 });  

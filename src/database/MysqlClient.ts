@@ -157,7 +157,7 @@ class MysqlClient implements SomeDataBase {
             connect.release();
         }
         
-        return {error: ['addToBasket -> Ошибка данных.']};
+        return {error: ['err-корзина(+)']};
     }
 
 
@@ -179,7 +179,7 @@ class MysqlClient implements SomeDataBase {
             connect.release();
         }
         
-        return {error: ['removeFromBasket -> Ошибка данных.']};
+        return {error: ['err-корзина(-)']};
     }
 
 

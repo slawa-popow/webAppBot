@@ -19,6 +19,7 @@ const URL = prodURL;
     const stockMan = new StockMan(finderMan);
     const basketMan = new BasketMan(hostConnector);
     const ticketMan = new TicketMan(hostConnector);
+    const tg = window.Telegram.WebApp;
     
     const vapee = new Vapee(
         stockMan,
@@ -28,6 +29,10 @@ const URL = prodURL;
     );
     
     await vapee.init(); 
+    $('#close').on('click', (e) => {
+        console.log('tg');
+        tg.close();
+    });
 
 })();
 
