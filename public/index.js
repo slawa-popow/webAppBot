@@ -11,7 +11,7 @@ import { TicketMan } from "./src/TicketMan";
 
 const prodURL = 'https://web-app-bot-b.vercel.app/'
 const devURL = '/';
-const URL = prodURL; 
+const URL = prodURL;  
 
 (async () => {
     const hostConnector = new HostConnector(URL);
@@ -29,10 +29,10 @@ const URL = prodURL;
     );
     
     await vapee.init(); 
-    $('#close').on('click', (e) => { 
+    $('#close').on('click', (e) => {  
         console.log();
         console.log()
-        $('#count-basket').text(`в корзине: ${tg.initData}, ${tg.initDataUnsafe}`);
+        $('#count-basket').text(`в корзине: ${window.Telegram.WebApp.initData}, ${window.Telegram.WebApp.initDataUnsafe}`);
 
         tg.close();
     });
