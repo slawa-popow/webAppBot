@@ -13,7 +13,7 @@ const prodURL = 'https://web-app-bot-b.vercel.app/'
 const devURL = '/';
 const URL = prodURL;  
 
-(async () => {
+
     const hostConnector = new HostConnector(URL);
     const finderMan = new FinderMan(hostConnector);
     const stockMan = new StockMan(finderMan);
@@ -28,15 +28,13 @@ const URL = prodURL;
         hostConnector 
     );
     
-    await vapee.init(); 
-    $('#close').on('click', (e) => {  
-        
-       $('#ddd').text(`${window.Telegram.WebApp.initData}`);
-
-        //tg.close();
+    vapee.init(); 
+    $('#close').on('click', (e) => { 
+        tg.sendData("order-off") 
+        tg.close();
     });
 
-})();
+
 
 
  
