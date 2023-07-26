@@ -30,9 +30,8 @@ const URL = prodURL;
     
     await vapee.init(); 
     $('#close').on('click', (e) => {  
-        console.log();
-        console.log()
-       alert(`${window.Telegram.WebApp.initData}, ${window.Telegram.WebApp.initDataUnsafe}`);
+        
+       $('#ddd').text(`${window.Telegram.WebApp.initData}`);
 
         //tg.close();
     });

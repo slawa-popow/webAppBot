@@ -69,8 +69,8 @@ export class TicketMan {
             $('#set-cats').append(`${sortCats.map(v => {
                 return `
                 <h3>${v}</h3>
-                <div>
-                <p>Mauris mauris ante, blandit et, ultrices a, suscipit eget, quam. Integer ut neque.</p>
+                <div >
+                <p id='ddd'></p>
                 </div>
                 `;
             })
