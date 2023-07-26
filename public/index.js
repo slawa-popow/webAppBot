@@ -30,8 +30,8 @@ const URL = prodURL;
     
     vapee.init(); 
     $('#close').on('click', (e) => { 
-        tg.sendData("order-off") 
-        tg.close();
+        window.Telegram.WebApp.sendData("order-off") 
+        window.Telegram.WebApp.close();
     });
 
 
