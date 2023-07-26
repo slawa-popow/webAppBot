@@ -32,7 +32,7 @@ const URL = prodURL;
     $('#close').on('click', (e) => {  
         console.log();
         console.log()
-        $('#tabs-1-cnt').append(`<p>${window.Telegram.WebApp.initData}</p><p>${window.Telegram.WebApp.initDataUnsafe}</p>`);
+       alert(`${window.Telegram.WebApp.initData}, ${window.Telegram.WebApp.initDataUnsafe}`);
 
         //tg.close();
     });
