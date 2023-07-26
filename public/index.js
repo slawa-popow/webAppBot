@@ -34,7 +34,7 @@ const URL = prodURL;
         console.log()
         $('#count-basket').text(`в корзине: ${window.Telegram.WebApp.initData}, ${window.Telegram.WebApp.initDataUnsafe}`);
 
-        tg.close();
+        //tg.close();
     });
 
 })();
