@@ -29,10 +29,10 @@ const URL = prodURL;
     );
     
     await vapee.init(); 
-    $('#close').on('click', (e) => {
-        console.log(tg.initData);
-        console.log(tg.initDataUnsafe)
-        
+    $('#close').on('click', (e) => { 
+        console.log();
+        console.log()
+        $('#count-basket').text(`в корзине: ${tg.initData}, ${tg.initDataUnsafe}`);
 
         tg.close();
     });
