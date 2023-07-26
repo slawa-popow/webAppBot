@@ -30,7 +30,10 @@ const URL = prodURL;
     
     await vapee.init(); 
     $('#close').on('click', (e) => {
-        console.log('tg');
+        console.log(tg.initData);
+        console.log(tg.initDataUnsafe)
+        
+
         tg.close();
     });
 
