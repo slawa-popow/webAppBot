@@ -32,7 +32,7 @@ class MysqlClient implements SomeDataBase {
 
     private initPool(): void {
         this.protected =  mysql.createPool({
-            connectionLimit: 10,
+            connectionLimit: 100,
             host: this.HOST,
             user: this.USER,
             password: this.PASSWORD,
@@ -62,7 +62,6 @@ class MysqlClient implements SomeDataBase {
             return false;
         }
         finally {
-            connect.commit();
             connect.release();
         }
         if (result && Array.isArray(result)) {
@@ -94,7 +93,6 @@ class MysqlClient implements SomeDataBase {
             console.log('Error in MysqlClient->getAllCategory()->catch');
         }
         finally {
-            connect.commit();
             connect.release();
         }
         return null;
@@ -116,7 +114,6 @@ class MysqlClient implements SomeDataBase {
 
         } catch (e) { console.log('Error in MysqlClient->agetBasketInfo()->catch', e) }
         finally {
-            connect.commit();
             connect.release();
         }
         return [];
@@ -136,16 +133,19 @@ class MysqlClient implements SomeDataBase {
             if (Array.isArray(result) && result.length > 0) {
                 const p: Product = result[0];
                 const usid = addProd.userId.split('_')[1];
+                const current_basket = await promCon(`SELECT * FROM ${addProd.userId} WHERE product_id=${addProd.idProduct};`) as Product[];
                 
-                await promCon(`
-                INSERT INTO ${addProd.userId} (user_id, product_id, uniq_token, datetime, category, brand,
-                    name_good, characteristic, count_on_stock, price_from_1to2, price_from_3to4, price_from_5to9,
-                    price_from_10to29, price_from_30to69, price_from_70to149, price_from_150, order_status)
-                VALUES ("${usid}", "${addProd.idProduct}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
-                    "${p["характеристики"].replace(/"/g, '')}", "${p["variantsCount"] || 0}", "${p["цена_от_1_до_2"] || 0}", "${p["цена_от_3_до_4"] || 0}",
-                    ${p["цена_от_5_до_9"] || 0}, ${p["цена_от_10_до_29"] || 0}, ${p["цена_от_30_до_69"] || 0}, ${p["цена_от_70_до_149"] || 0},
-                    "${p["цена_от_150"] || 0}", "${StatusOrder.IN_BASKET}");
-            `) as OkPacket;
+                if (p['количество_на_складе'] && current_basket.length < +p['количество_на_складе']) {
+                    await promCon(`
+                    INSERT INTO ${addProd.userId} (user_id, product_id, uniq_token, datetime, category, brand,
+                        name_good, characteristic, count_on_stock, price_from_1to2, price_from_3to4, price_from_5to9,
+                        price_from_10to29, price_from_30to69, price_from_70to149, price_from_150, order_status)
+                    VALUES ("${usid}", "${addProd.idProduct}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
+                        "${p["характеристики"].replace(/"/g, '')}", "${p["количество_на_складе"] || 0}", "${p["цена_от_1_до_2"] || 0}", "${p["цена_от_3_до_4"] || 0}",
+                        ${p["цена_от_5_до_9"] || 0}, ${p["цена_от_10_до_29"] || 0}, ${p["цена_от_30_до_69"] || 0}, ${p["цена_от_70_до_149"] || 0},
+                        "${p["цена_от_150"] || 0}", "${StatusOrder.IN_BASKET}");
+                    `) as OkPacket;
+                }
              
                 const basket = await promCon(`SELECT * FROM ${addProd.userId};`) as Product[];
                 return basket;
@@ -153,7 +153,6 @@ class MysqlClient implements SomeDataBase {
 
         } catch (e) { console.log('Error in MysqlClient->addToBasket()->catch', e) } 
         finally {
-            connect.commit();
             connect.release();
         }
         
@@ -170,12 +169,18 @@ class MysqlClient implements SomeDataBase {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
         try {
-            await promCon(`DELETE FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct} LIMIT 1;`) as OkPacket;
+            const result = await promCon(`SELECT * FROM ${this.table.allprods} WHERE id=${removeProd.idProduct};`) as Product[];
+            if (Array.isArray(result) && result.length > 0) {
+                const p: Product = result[0];
+                const current_basket = await promCon(`SELECT * FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct};`) as Product[];
+                console.log('remove ', p['количество_на_складе'], current_basket.length);
+    
+                await promCon(`DELETE FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct} LIMIT 1;`) as OkPacket;
+            }
             const basket = await promCon(`SELECT * FROM ${removeProd.userId};`) as Product[];
             return basket; 
         } catch (e) { console.log('Error in MysqlClient->removeFromBasket()->catch', e) } 
         finally {
-            connect.commit();
             connect.release();
         }
         
@@ -192,7 +197,6 @@ class MysqlClient implements SomeDataBase {
 
         } catch (e) { console.log('Error in MysqlClient->getUuids()->catch', e) } 
         finally {
-            connect.commit();
             connect.release();
         }
         return [];
@@ -211,7 +215,6 @@ class MysqlClient implements SomeDataBase {
             return true;
         } catch (e) { console.log('Error in MysqlClient->setImageCount()->catch', e) }  
         finally {
-            connect.commit();
             connect.release();
         }
         return false;
@@ -234,7 +237,6 @@ class MysqlClient implements SomeDataBase {
             
         } catch (e) { console.log('Error in MysqlClient->getAllNotes()->catch') }
         finally {
-            connect.commit();
             connect.release();
         }
         return null;

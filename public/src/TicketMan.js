@@ -49,6 +49,7 @@ export class TicketMan {
         $('#count-basket').text(`в корзине: ${this.vapee.basketMan.userBasket.length }`);
         await this.makeProductTickets(allData); // array div's 
         await this.makeTab(); 
+        $('#loader').css({'display': 'none'})
     }
 
 

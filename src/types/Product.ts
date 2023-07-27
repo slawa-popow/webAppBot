@@ -7,7 +7,7 @@ export interface ErrorInsertInto {
 export interface Product {
     id: string | number;
     uuid: string;
-    variantsCount?: number;
+    количество_на_складе?: number;
     группы: string;
     код: string;
     бренд: string;
