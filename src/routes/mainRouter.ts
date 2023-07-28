@@ -11,6 +11,7 @@ mainRouter.post('/getTenProd', validUsr, mainController.getTenProd);
 mainRouter.post('/getUsid', validUsr, mainController.getUserId); 
 mainRouter.post('/addProductOnBasket', validUsr, mainController.addToBasket);
 mainRouter.post('/removeProductFromBasket', validUsr, mainController.removeFromBasket);
+mainRouter.post('/getFindByCharacteristics', validUsr, mainController.searchByCharacts);
 //
 // mainRouter.get('/Djiugurda', mainController.fromMySklad);
 

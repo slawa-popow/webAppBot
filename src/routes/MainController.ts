@@ -5,6 +5,7 @@ import { Product } from '../types/Product';
 import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
 import { ResultFromMySklad } from '../types/ResultFromMySklad';
 import { ReqAddToBasket } from '../types/ReqAddToBasket';
+import { FrontInputData } from '../types/FrontInputData';
 // import { CountAndImage } from '../types/CountAndImage';
 
 interface ResultAllProds {
@@ -22,7 +23,7 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('index01', {layout: 'main01'});  
+        return response.status(200).render('indexX', {layout: 'mainX'});  
     }
 
 
@@ -63,6 +64,14 @@ class MainController {
     }
 
 
+    async searchByCharacts(request: Request, response: Response) {
+        
+        const data: FrontInputData = request.body;
+        const result = await db.findByCharacts(data);
+        response.status(200).json(result)
+    }
+
+
     async getTenProd(request: Request, response: Response) {
         const id = request.session!.id;
         
@@ -89,7 +98,7 @@ class MainController {
             const fromMySklad: ResultFromMySklad = await getImgSrcFromMySklad(i.uuid);
             const img = fromMySklad.img;
             const count = fromMySklad.variantsCount;
-            const res = [i.id, img, count] as string[];//{id: i.id, img: img, variantsCount: count};
+            const res = [i.id, img, count] as string[];//{id: i.id, img: img, variantsCount: count}; 
             console.log(res);
             X.push(res);
         }

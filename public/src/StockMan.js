@@ -22,15 +22,14 @@ export class StockMan {
 
     /**
      * Запрос на поиск по характеристикам
-     * @param {Array} arrCharts характеристики ['крепкие', 'синие', ...] 
+     * @param {object} forRequest данные из полей для поиска  
      */
-    async findByCharacteristics(arrCharts) {
-        if (this.finderMan && Array.isArray(arrCharts) && arrCharts.length > 0) {
-            const pack = {characteristics: [...arrCharts]};
-            const result = await this.finderMan.findByCharacteristics(pack);
+    async findByCharacteristics(forRequest) {
+        if (this.finderMan) {
+            const result = await this.finderMan.getFindByCharacteristic(forRequest);
             return result;
-        }
-        throw new Error('\nError in StockMan->findByCharacteristics(): Not defined finderMan or empty characteristics array\n');
+            }
+        return null;
     }
 
     async getCategory() {

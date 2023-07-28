@@ -1,3 +1,4 @@
+import { FrontInputData } from "../types/FrontInputData";
 import { AllCategory, ErrorInsertInto, Product } from "../types/Product";
 import { ReqAddToBasket } from "../types/ReqAddToBasket";
 import { SomeDataBase } from "../types/SomeDataBase";
@@ -47,7 +48,15 @@ class Db {
 
     // вернуть все категории
     async getAllCategory(): Promise<AllCategory | null> {
-        return await this.client.getAllCategory();
+        const cats = await this.client.getAllCategory();
+       
+        return cats;
+    }
+
+    // поиск по характеристикам
+    async findByCharacts(data: FrontInputData): Promise<Product[]> {
+        const result = await this.client.findByCharacts(data);
+        return result;
     }
 
     // выбрать uuid, primary_id

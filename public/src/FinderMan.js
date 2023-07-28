@@ -23,14 +23,14 @@ export class FinderMan {
     
     /**
      * Запрос на поиск по характеристикам
-     * @param {Array} arrCharts характеристики ['крепкие', 'синие', ...] 
+     * @param {object} forRequest данные из полей для поиска 
      * @returns {Array | null}
      */
-    async  getFindByCharacters(pack) {
+    async  getFindByCharacteristic(forRequest) {
         try {
             if (!this.hc)
                 throw new Error('HostConnector instance is null or undefined');
-            return await this.hc.getFindByCharacters(pack); 
+            return await this.hc.getFindByCharacters(forRequest); 
         } catch (error) { console.error('Error in FinderMan->getFindByCharacters()', error); }        
         return null;
     }

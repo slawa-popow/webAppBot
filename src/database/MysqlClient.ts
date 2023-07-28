@@ -6,8 +6,10 @@ import dotenv from 'dotenv';
 import { AllCategory, ErrorInsertInto, Product } from '../types/Product';
 import { promisify } from 'util';
 import { ReqAddToBasket } from "../types/ReqAddToBasket";
-import { OkPacket } from "../types/OkPacket";
+import { OkPacket, RowDataPacketCharacteristic } from "../types/OkPacket";
 import { StatusOrder } from "../types/StatusOrder";
+import { CatsHaracters } from "../types/CatsHaracters";
+import { FrontInputData } from "../types/FrontInputData";
 // import { OkPacket } from '../types/OkPacket'
 
 interface Tables {
@@ -73,21 +75,69 @@ class MysqlClient implements SomeDataBase {
         return isOk;
     }
 
+
+    /**
+    * should input data
+    * {
+        category: 'Снюс',
+        characteristics: [ 'крепкие 50мг(hard)', 'сладкие' ],
+        searchText: 'Apolo blue'
+       }
+    */
+    async findByCharacts(data: FrontInputData): Promise<Product[]> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+         
+        const nameChars: string = data.characteristics.map((v: string) => {
+            return `характеристики LIKE "%${v}%"`;
+        }).join(' AND ');
+        try {
+            const qfind = await promCon(`
+            SELECT * FROM Товары WHERE 
+            ${nameChars}
+            AND LCASE(группы)="${data.category}";
+            `) as Product[];
+            
+            return qfind;
+
+        } catch {
+            console.log('Error in MysqlClient->findByCharacts()->catch');
+        }
+        finally {
+            connect.release();
+        }
+        return [];
+    }
+
+
     async getAllCategory(): Promise<AllCategory | null> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
+        let responseCats: CatsHaracters = {categories: [], characteristics: {}};
         try {
             const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(группы, "/", 1) 
                                           FROM ${this.table.allprods};`) as Record<string, string>[];
+
            
             let rows = result.map((v) => {
                 const value = Object.values(v);
                 if (value.length > 0) 
                     return value[0];
                 return;
-            }) as string[];
-
-            return (rows.length > 0) ? {categories: [...rows]} : null;
+            })as string[];
+            
+            responseCats.categories.push(...rows); // вставим все категории
+            // получить все уникальные характеристики по каждой категории
+            for (let v of rows) {
+                const charactsQuery = await promCon(`
+                SELECT DISTINCT LCASE(характеристики) AS characteristics FROM Товары WHERE LCASE(характеристики) LIKE "%${v.toLowerCase()}%"; 
+                `) as RowDataPacketCharacteristic[];
+                
+                let strCharacts = charactsQuery[0].characteristics.split('/');
+                const str = strCharacts.slice(0, strCharacts.length-1);
+                responseCats.characteristics[v] = [...str];
+            } 
+            return responseCats;
 
         } catch {
             console.log('Error in MysqlClient->getAllCategory()->catch');
@@ -169,14 +219,10 @@ class MysqlClient implements SomeDataBase {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
         try {
-            const result = await promCon(`SELECT * FROM ${this.table.allprods} WHERE id=${removeProd.idProduct};`) as Product[];
-            if (Array.isArray(result) && result.length > 0) {
-                const p: Product = result[0];
-                const current_basket = await promCon(`SELECT * FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct};`) as Product[];
-                console.log('remove ', p['количество_на_складе'], current_basket.length);
-    
+            const current_basket = await promCon(`SELECT * FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct};`) as Product[];
+            if (current_basket.length > 0)
                 await promCon(`DELETE FROM ${removeProd.userId} WHERE product_id=${removeProd.idProduct} LIMIT 1;`) as OkPacket;
-            }
+        
             const basket = await promCon(`SELECT * FROM ${removeProd.userId};`) as Product[];
             return basket; 
         } catch (e) { console.log('Error in MysqlClient->removeFromBasket()->catch', e) } 

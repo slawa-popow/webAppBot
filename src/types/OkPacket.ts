@@ -15,3 +15,7 @@ export interface OkPacket {
     changedRows?: number
 }
 
+export interface RowDataPacketCharacteristic {
+    characteristics: string;
+}
+

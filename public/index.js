@@ -32,7 +32,6 @@ const URL = prodURL;
 
     $('#close').on('click', (e) => { 
         window.Telegram.WebApp.sendData("order-off") 
-        // window.Telegram.WebApp.close();
     });
 
     

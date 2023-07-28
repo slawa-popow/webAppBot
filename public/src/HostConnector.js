@@ -44,7 +44,7 @@ export class HostConnector {
         try {
             const url =  this.host + this.api.getCats;
             const response = await axios.post(url, {})
-            return response.data.categories || [];
+            return response.data || [];
 
         } catch (error) { console.error('Error in FinderMan->getCategory()', error); } 
         return null;
@@ -98,15 +98,16 @@ export class HostConnector {
 
     /**
      * Запрос на поиск по характеристикам
-     * @param {characteristics: string[]} 
+     * @param {object} 
      * @returns {Array | null} 
      */
     async getFindByCharacters(pack) {
         try {
             if (!pack || !pack.characteristics)
                 throw new Error('Empty pack. POST request is not possible.');
+            console.log('ok');
             const url = this.host + this.api.getFindByChars;
-            const response = await axios.post(url=url, data=pack);
+            const response = await axios.post(url, pack);
             return response.data;
         }
         catch (error) { console.error('Error in HostConnector->getFindByCharacters() ', error); }

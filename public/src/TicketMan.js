@@ -62,20 +62,52 @@ export class TicketMan {
         $('#cnt').on("click", (e) => {
             $('#tabs').tabs( "option", "active", 10 );
         });
-        
-// query_id=AAHrOrtzAAAAAOs6u3On2cDm&user=%7B%22id%22%3A1941650155%2C%22first_name%22%3A%22Slava%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22Pwg90%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1690386445&hash=268489f1c090ca1c40483be3ea489cdf77fba5c618b6c5fe2c29910a1a5ffe15
+        $( function() {
+            $( "input" ).checkboxradio();
+        });
+        // query_id=AAHrOrtzAAAAAOs6u3On2cDm&user=%7B%22id%22%3A1941650155%2C%22first_name%22%3A%22Slava%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22Pwg90%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1690386445&hash=268489f1c090ca1c40483be3ea489cdf77fba5c618b6c5fe2c29910a1a5ffe15
+        /*   крепкие/кислые/Электронные сигареты   */
 
-
-        const cats = await this.hc.getCategory();
+        const result = await this.hc.getCategory();
+        const cats = result.categories;
+        const characts = result.characteristics;
+       
         let sortCats = [...cats].sort();
         if (cats.length > 0) {
-            $('#set-cats').append(`${sortCats.map(v => {
-                return `
+            $('#set-cats').append(`${sortCats.map( (v) => {
+                const chrs = characts[v]; // array characteristics from result.characteristics
+                const idName = v.replace(/\s+/g, '_');
+                let checkboxs = chrs.filter(a => {return a.length > 0})
+                .map((nameCharact, i) => {
+                    let color = (i % 2 === 0) ? '#f3f3f3': 'white';
+                    
+                    return `
+                        <div style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
+                        <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameCharact}</label>
+                        <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameCharact}">
+                        </div>
+                        
+                    `;
+                    }).join('\n');
+
+                const sumbitId = v.replace(/\s+/g, '_');
+
+                const searchForms =  `
                 <h3>${v}</h3>
                 <div >
-                <p id='ddd'></p>
+                <p>Выбери критерии поиска:</p>
+                    <form name=form-${sumbitId}>
+                        <fieldset>
+                            <legend> Характеристики: </legend>
+                            ${checkboxs}
+                            <input type="text" id="setText-${sumbitId}" name="${idName}"/>
+                        </fieldset>
+                    </form>
+                    <button id="submit-${sumbitId}">Поиск</button>
                 </div>
                 `;
+                 
+                return searchForms;
             })
             .join('\n')}`);
         }
@@ -83,6 +115,36 @@ export class TicketMan {
         $( "#set-cats" ).accordion({
             collapsible: true
         }); 
+
+        for (let v of sortCats) {
+            const id = v.replace(/\s+/g, '_');
+           $(`#submit-${id}`).on('click', async (e) => {
+            const idform = 'form-' + id;
+            const elemsForm = document.forms[idform].elements[id];
+            const inputField = document.getElementById(`setText-${id}`);
+            const forRequest = {
+                category: v,
+                characteristics: [],
+                searchText: ''
+            };
+            if (elemsForm.length > 0) {
+                for (let elem of elemsForm) {
+                    if (elem.checked)
+                        forRequest.characteristics.push(elem.id)
+                } 
+            }
+            const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
+            (validText) ? forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
+            
+            $('#cnt').remove();
+            $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+            const result = await this.vapee.stockMan.findByCharacteristics(forRequest);
+            $('#tabs').tabs( "option", "active", 10 );
+            await this.makeProductTickets(result); // array div's
+
+            console.log(result);
+        }); 
+        }
          
         
     }
@@ -126,6 +188,7 @@ export class TicketMan {
                             <p class='title'>${v['бренд'] || ''}</p>
                             <p class="title">В наличии:</p>
                             <p class="subtitle">${count_on_stock}</p>
+                            <p class="subtitle, subtitle-chars">${v['характеристики']}</p>
                         </div>
                         
                     </div>
