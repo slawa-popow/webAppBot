@@ -34,6 +34,12 @@ const URL = prodURL;
         window.Telegram.WebApp.sendData("order-off") 
     });
 
+    $( window ).on( "resize", () => {
+        $('.set-cats').css('max-height', () => {
+            return +$(window).height()-220;
+        } );
+        $('.set-cats').css('overflow-y', 'scroll');
+    });
     
 
 

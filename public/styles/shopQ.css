@@ -6,8 +6,7 @@
 
 .header {
   width: 100%;
-  background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
-  height: 80px;
+  height: 50px;
 }
 
 .header h4 {
@@ -162,6 +161,13 @@ body {
   cursor: pointer;
  }
 
+ .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+  border: 1px solid #6285ec;
+  background-image: linear-gradient(to top, #22ace8 10%, #54c1f0bf 40%, #9fe0fcaa 50%);
+  font-weight: normal;
+  color: #ffffffe4;
+}
+
  .btn-plus {
   background-image: linear-gradient(to top, #c1dfc4 0%, #deecdd 100%);
  }
@@ -182,10 +188,22 @@ body {
   font-size: 1.1em;
  }
 
- #tabs a {
+ #tabs li  {
    font-size: 0.85em;
    text-align: center;
+   height: 64px;
   }
+  
+  .li-a-cats {
+    height: 85%;
+  }
+
+  /* .set-cats {
+    max-height: 400px;
+    overflow-y: scroll;
+    margin-bottom: 100px;
+  } */
+
 
   .ui-accordion .ui-accordion-content {
     padding: 0.8em 1em;
@@ -195,8 +213,17 @@ body {
   padding: 0;
   margin: 0;
   font-weight: bold;
-  font-size: 1em;
-  color: #e44c77;
+  font-size: 0.9em;
+  color: #575757bb;
+ }
+
+ #total {
+  padding: 0;
+  padding-bottom: 4px;
+  margin: 0;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: #040404c8;
  }
 
  .resp-category {
@@ -219,13 +246,9 @@ body {
   top: 0;
  } 
 
- .settings-widget li {
-  height: 50px;
- }
- .like {
-  background-image: linear-gradient(to top, #e6b980 0%, #eacda3 100%);
-  height: 38px;
-  color: #f7f7f7;
- }
+ 
+ 
+
+ 
 
  

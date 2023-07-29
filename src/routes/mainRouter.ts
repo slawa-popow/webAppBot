@@ -9,8 +9,8 @@ mainRouter.get('/',validateUser, mainController.getIndexPage);
 mainRouter.post('/getCategory', validUsr, mainController.getAllCategory);
 mainRouter.post('/getTenProd', validUsr, mainController.getTenProd);
 mainRouter.post('/getUsid', validUsr, mainController.getUserId); 
-mainRouter.post('/addProductOnBasket', validUsr, mainController.addToBasket);
-mainRouter.post('/removeProductFromBasket', validUsr, mainController.removeFromBasket);
+mainRouter.put('/addProductOnBasket', validUsr, mainController.addToBasket);
+mainRouter.put('/removeProductFromBasket', validUsr, mainController.removeFromBasket);
 mainRouter.post('/getFindByCharacteristics', validUsr, mainController.searchByCharacts);
 //
 // mainRouter.get('/Djiugurda', mainController.fromMySklad);

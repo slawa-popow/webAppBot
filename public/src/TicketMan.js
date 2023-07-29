@@ -47,6 +47,10 @@ export class TicketMan {
         }
         $('#usid').text(`Твой telegram id = ${usid}`);
         $('#count-basket').text(`в корзине: ${this.vapee.basketMan.userBasket.length }`);
+        let total = this.vapee.basketMan.userBasket.reduce((pv, cv) => {
+            return pv + (+cv.count_on_order);
+        }, 0);
+        $('#total').text(`всего товаров: ${total}`);
         await this.makeProductTickets(allData); // array div's 
         await this.makeTab(); 
         $('#loader').css({'display': 'none'})
@@ -71,7 +75,7 @@ export class TicketMan {
         const result = await this.hc.getCategory();
         const cats = result.categories;
         const characts = result.characteristics;
-       
+                 
         let sortCats = [...cats].sort();
         if (cats.length > 0) {
             $('#set-cats').append(`${sortCats.map( (v) => {
@@ -115,6 +119,10 @@ export class TicketMan {
         $( "#set-cats" ).accordion({
             collapsible: true
         }); 
+        $('.set-cats').css('max-height', () => {
+            return +$(window).height()-220;
+        } );
+        $('.set-cats').css('overflow-y', 'scroll');
 
         for (let v of sortCats) {
             const id = v.replace(/\s+/g, '_');
@@ -200,29 +208,38 @@ export class TicketMan {
             (async (id, onStock)=>{
                 
                 $( `#plus_${id}` ).on( "click", async (e) => {
-                    console.log('plus ', e.target.id.split('_')[1]);
                     let currCnt = $(`#count_${id}`).text();
                     currCnt = ((+currCnt >= 0) && (+currCnt < onStock)) ? (+currCnt) + 1 : currCnt;
                     $(`#count_${id}`).text(''+currCnt);
                     const userId = this.vapee.userId;
                     const response = await this.vapee.basketMan.addProduct(userId, id);
+
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
+                        let total = response.reduce((pv, cv) => {
+                            return pv + (+cv.count_on_order);
+                        }, 0);
+                        $('#total').text(`всего товаров: ${total}`);
                     } else {
                         this.clearContent(response);
                     } 
                 });
+
+
                 $( `#minus_${id}` ).on( "click", async (e) => {
                     let currCnt = $(`#count_${id}`).text();
                     currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
                     $(`#count_${id}`).text(''+currCnt);
                     const userId = this.vapee.userId;
-                    console.log('minus ', id);
                     const response = await this.vapee.basketMan.removeProduct(userId, id);
+
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
+                        let total = response.reduce((pv, cv) => {
+                            return pv + (+cv.count_on_order);
+                        }, 0);
+                        $('#total').text(`всего товаров: ${total}`);
                     } else {
-                        console.log(response);
                         this.clearContent(response);
                     }
                 });

@@ -166,7 +166,7 @@ class HostConnector {
   async addProduct(userId, id) {
     try {
       const url = this.host + this.api.addProductOnBasket;
-      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].put(url, {
         userId: userId,
         idProduct: id
       });
@@ -179,7 +179,7 @@ class HostConnector {
   async removeProduct(userId, id) {
     try {
       const url = this.host + this.api.removeProductFromBasket;
-      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].put(url, {
         userId: userId,
         idProduct: id
       });
@@ -326,6 +326,10 @@ class TicketMan {
     }
     $('#usid').text(`Твой telegram id = ${usid}`);
     $('#count-basket').text(`в корзине: ${this.vapee.basketMan.userBasket.length}`);
+    let total = this.vapee.basketMan.userBasket.reduce((pv, cv) => {
+      return pv + +cv.count_on_order;
+    }, 0);
+    $('#total').text(`всего товаров: ${total}`);
     await this.makeProductTickets(allData); // array div's 
     await this.makeTab();
     $('#loader').css({
@@ -390,6 +394,10 @@ class TicketMan {
     $("#set-cats").accordion({
       collapsible: true
     });
+    $('.set-cats').css('max-height', () => {
+      return +$(window).height() - 220;
+    });
+    $('.set-cats').css('overflow-y', 'scroll');
     for (let v of sortCats) {
       const id = v.replace(/\s+/g, '_');
       $(`#submit-${id}`).on('click', async e => {
@@ -466,7 +474,6 @@ class TicketMan {
       $('#cnt').append(ticket);
       (async (id, onStock) => {
         $(`#plus_${id}`).on("click", async e => {
-          console.log('plus ', e.target.id.split('_')[1]);
           let currCnt = $(`#count_${id}`).text();
           currCnt = +currCnt >= 0 && +currCnt < onStock ? +currCnt + 1 : currCnt;
           $(`#count_${id}`).text('' + currCnt);
@@ -474,6 +481,10 @@ class TicketMan {
           const response = await this.vapee.basketMan.addProduct(userId, id);
           if (Array.isArray(response)) {
             $('#count-basket').text(`в корзине: ${response.length}`);
+            let total = response.reduce((pv, cv) => {
+              return pv + +cv.count_on_order;
+            }, 0);
+            $('#total').text(`всего товаров: ${total}`);
           } else {
             this.clearContent(response);
           }
@@ -483,12 +494,14 @@ class TicketMan {
           currCnt = +currCnt > 0 ? +currCnt - 1 : currCnt;
           $(`#count_${id}`).text('' + currCnt);
           const userId = this.vapee.userId;
-          console.log('minus ', id);
           const response = await this.vapee.basketMan.removeProduct(userId, id);
           if (Array.isArray(response)) {
             $('#count-basket').text(`в корзине: ${response.length}`);
+            let total = response.reduce((pv, cv) => {
+              return pv + +cv.count_on_order;
+            }, 0);
+            $('#total').text(`всего товаров: ${total}`);
           } else {
-            console.log(response);
             this.clearContent(response);
           }
         });
@@ -37830,6 +37843,12 @@ const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basket
 vapee.init();
 $('#close').on('click', e => {
   window.Telegram.WebApp.sendData("order-off");
+});
+$(window).on("resize", () => {
+  $('.set-cats').css('max-height', () => {
+    return +$(window).height() - 220;
+  });
+  $('.set-cats').css('overflow-y', 'scroll');
 });
 
 // -------------------------------------------------------------------------

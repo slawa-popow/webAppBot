@@ -58,7 +58,7 @@ export class HostConnector {
     async addProduct(userId, id) {
         try {
             const url = this.host + this.api.addProductOnBasket;
-            const resp = await axios.post(url, {userId: userId,idProduct: id});
+            const resp = await axios.put(url, {userId: userId, idProduct: id});
             return resp.data;
  
         } catch (e) { 
@@ -71,7 +71,7 @@ export class HostConnector {
     async removeProduct(userId, id) {
         try {
             const url = this.host + this.api.removeProductFromBasket;
-            const resp = await axios.post(url, {userId: userId,idProduct: id});
+            const resp = await axios.put(url, {userId: userId, idProduct: id});
             return resp.data;
 
         } catch (e) { 
