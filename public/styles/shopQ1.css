@@ -248,7 +248,72 @@ body {
 
  
  
+/* ------------- message --------------------- */
 
+
+.message {
+  display: flex;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  z-index: 10;
+  width: 200px;
+  height: 200px;
+  background-color: #676663;
+  border-radius: 10px;
+}
+
+.wrap-msg {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  margin: 3px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.wrap-msg-title {
+  display: flex;
+  height: 20%;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  background-image: linear-gradient(to right, #868f96 0%, #596164 100%);
+  color: whitesmoke;
+  border-radius: 8px 8px 0 0;
+}
+
+.alert-msg {
+  padding: 2px 0 0 6px;
+} 
+
+.wrap-msg-title button {
+  border-radius: 5px;
+  margin-right: 2px;
+}
+
+.wrap-msg-message {
+  display: inline-flex;
+  text-align: center;
+  padding: 10px;
+  height: 80%;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.wrap-load-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wrap-load-img img {
+  max-width: 50px;
+  max-height: 50px;
+  margin-bottom: 45px;
+  
+}
  
 
  

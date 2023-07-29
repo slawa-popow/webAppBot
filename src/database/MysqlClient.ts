@@ -143,12 +143,10 @@ class MysqlClient implements SomeDataBase {
                         });
                     }
                 });
-            
-                console.log('set ', setCharactsQuery);
-            
+                        
                 responseCats.characteristics[v] = Array.from(setCharactsQuery) as string[];
             } 
-            console.log(responseCats);
+        
             return responseCats;
 
         } catch {

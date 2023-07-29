@@ -53,7 +53,8 @@ export class TicketMan {
         $('#total').text(`всего товаров: ${total}`);
         await this.makeProductTickets(allData); // array div's 
         await this.makeTab(); 
-        $('#loader').css({'display': 'none'})
+        $('#loader').css({'display': 'none'});
+        
     }
 
 
@@ -143,20 +144,42 @@ export class TicketMan {
             }
             const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
             (validText) ? forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
-            
             $('#cnt').remove();
             $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+            this.msg('загрузка...', forRequest.category);
             const result = await this.vapee.stockMan.findByCharacteristics(forRequest);
             $('#tabs').tabs( "option", "active", 10 );
-            await this.makeProductTickets(result); // array div's
-
-            console.log(result);
-        }); 
+            if (result.length > 0) {
+                await this.makeProductTickets(result); // array div's
+            } else {
+                $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                $('#alert-message').remove(); // убрать окно загрузки
+            }
+            
+        }); // end_action_on_click_button
         }
          
         
     }
 
+    // показать окно загрузки
+    msg(title, message) {
+        const msg =  $(`
+            <div id="alert-message" class="message">
+            <div class="wrap-msg">
+                <div class="wrap-msg-title">
+                    <p class="alert-msg">${title}</p>
+                </div>
+                <div class="wrap-msg-message"><p>${message}</p></div>
+                <div class="wrap-load-img"><img src="load-img.gif" alt=""></div>
+            </div>
+        </div>
+        `);
+
+        $('#cnt').append(msg);
+    };
+
+    
 
     /**
      * Создать карточки html и вставить на страницу
@@ -213,7 +236,7 @@ export class TicketMan {
                     $(`#count_${id}`).text(''+currCnt);
                     const userId = this.vapee.userId;
                     const response = await this.vapee.basketMan.addProduct(userId, id);
-
+                    
                     if (Array.isArray(response)) {
                         $('#count-basket').text(`в корзине: ${response.length}`);
                         let total = response.reduce((pv, cv) => {
@@ -248,6 +271,7 @@ export class TicketMan {
             })(vid, count_on_stock);
     
         }
+        $('#alert-message').remove(); // убрать окно загрузки
     }
     
     /**
