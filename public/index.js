@@ -9,7 +9,7 @@ import { HostConnector } from "./src/HostConnector";
 import { BasketMan } from "./src/BasketMan";
 import { TicketMan } from "./src/TicketMan";
 
-const prodURL = 'https://web-app-bot-b.vercel.app/'
+const prodURL = 'https://web-app-bot-b.vercel.app/' 
 const devURL = '/';
 const URL = prodURL;
 

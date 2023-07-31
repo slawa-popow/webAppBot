@@ -81,6 +81,7 @@ class MysqlClient implements SomeDataBase {
     * {
         category: 'Снюс',
         characteristics: [ 'крепкие 50мг(hard)', 'сладкие' ],
+        brands: [],
         searchText: 'Apolo blue'
        }
     */

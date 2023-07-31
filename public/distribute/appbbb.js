@@ -289,8 +289,13 @@ class TicketMan {
     this.hc = hostConnector;
     this.vapee = null;
     this.bucket = null; // Временное хранилище для выборок 
+    this.forRequest = {
+      // поиск по хар-кам
+      category: '',
+      characteristics: [],
+      searchText: ''
+    };
   }
-
   setData(data) {
     if (this.bucket) this.bucket = undefined;
     this.bucket = data;
@@ -325,7 +330,7 @@ class TicketMan {
       return;
     }
     $('#usid').text(`Твой telegram id = ${usid}`);
-    $('#count-basket').text(`в корзине: ${this.vapee.basketMan.userBasket.length}`);
+    $('#count-basket').text(`кол-во позиций: ${this.vapee.basketMan.userBasket.length}`);
     let total = this.vapee.basketMan.userBasket.reduce((pv, cv) => {
       return pv + +cv.count_on_order;
     }, 0);
@@ -339,6 +344,7 @@ class TicketMan {
 
   /**
    * Создать виджет Tab jQuery
+   * heightStyle: "fill"
    */
   async makeTab() {
     $("#tabs").tabs({
@@ -365,13 +371,15 @@ class TicketMan {
           return a.length > 0;
         }).map((nameCharact, i) => {
           let color = i % 2 === 0 ? '#f3f3f3' : 'white';
-          return `
+          // let idNameCharact = 'cbx_'+nameCharact.replace(/[. :?*+^$[\]\\(){}|-]+/g, '_');
+          const checkBlock = `
                         <div style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
                         <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameCharact}</label>
                         <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameCharact}">
                         </div>
                         
                     `;
+          return checkBlock;
         }).join('\n');
         const sumbitId = v.replace(/\s+/g, '_');
         const searchForms = `
@@ -392,35 +400,85 @@ class TicketMan {
       }).join('\n')}`);
     }
     $("#set-cats").accordion({
-      collapsible: true
+      heightStyle: "content",
+      collapsible: true,
+      active: 10000,
+      activate: (e, ui) => {
+        if (ui.newHeader[0]) {
+          this.forRequest.category = ui.newHeader[0].textContent;
+          $(`#finded-characteristics`).empty();
+          $('input[type=checkbox]:checked').each(function () {
+            this.checked = false;
+          });
+          this.forRequest.characteristics.length = 0;
+        } else {
+          this.forRequest.category = '';
+          this.forRequest.characteristics.length = 0;
+          this.forRequest.searchText = '';
+        }
+      }
     });
     $('.set-cats').css('max-height', () => {
       return +$(window).height() - 220;
     });
     $('.set-cats').css('overflow-y', 'scroll');
+    $('input[type="checkbox"]').on('change', async e => {
+      // обработчик галочек
+      const buttonId = e.target.id.replace(/[. :?*+^$[\]\\(){}|-]/g, '_');
+      const labelChar = `
+                <div id='label-${buttonId}' class="label-find-char">
+                    <div id="title-find-char" class="title-find-char">${(this, e.target.id)}</div>
+                    <button id="remove-${buttonId}" class="remove-find-char">x</button>
+                </div> `;
+      if (e.target.checked === false) {
+        const indxDel = this.forRequest.characteristics.findIndex(v => {
+          return v === e.target.id;
+        });
+        if (indxDel >= 0) {
+          delete this.forRequest.characteristics[indxDel];
+          console.log('not ', this.forRequest.characteristics, e.target.id, indxDel);
+        }
+        $(`#label-${buttonId}`).remove();
+      } else {
+        $(`#finded-characteristics`).append(labelChar);
+        this.forRequest.characteristics.push(e.target.id);
+        console.log('is ', this.forRequest.characteristics, e.target.id);
+      }
+      $(`#remove-${buttonId}`).on('click', evn => {
+        // обработчик удаления метки хар-ки
+        e.target.checked = false;
+        $(`#label-${buttonId}`).remove();
+        const indxDel = this.forRequest.characteristics.findIndex(v => {
+          return v === e.target.id;
+        });
+        if (indxDel >= 0) {
+          delete this.forRequest.characteristics[indxDel];
+          console.log(this.forRequest.characteristics);
+        }
+      });
+    });
     for (let v of sortCats) {
       const id = v.replace(/\s+/g, '_');
-      $(`#submit-${id}`).on('click', async e => {
+      $(`#submit-${id}`).on('click', async () => {
+        // action_on_click_button
         const idform = 'form-' + id;
         const elemsForm = document.forms[idform].elements[id];
         const inputField = document.getElementById(`setText-${id}`);
-        const forRequest = {
-          category: v,
-          characteristics: [],
-          searchText: ''
-        };
-        if (elemsForm.length > 0) {
-          for (let elem of elemsForm) {
-            if (elem.checked) forRequest.characteristics.push(elem.id);
-          }
-        }
         const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
-        validText ? forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
+        validText ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
+
+        // $('#select-cats').text(`Выбрано характеристик: ${forRequest.characteristics.length}`)
+        // $('#list-cats').text(forRequest.characteristics.join(' & '));
+
         $('#cnt').remove();
         $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
-        this.msg('загрузка...', forRequest.category);
-        const result = await this.vapee.stockMan.findByCharacteristics(forRequest);
-        $('#tabs').tabs("option", "active", 10);
+        this.msg('загрузка...', this.forRequest.category);
+        this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {
+          return val && val.length > 0;
+        });
+        console.log(this.forRequest);
+        const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+        $('#tabs').tabs("option", "active", 10000);
         if (result.length > 0) {
           await this.makeProductTickets(result); // array div's
         } else {
@@ -499,7 +557,7 @@ class TicketMan {
           const userId = this.vapee.userId;
           const response = await this.vapee.basketMan.addProduct(userId, id);
           if (Array.isArray(response)) {
-            $('#count-basket').text(`в корзине: ${response.length}`);
+            $('#count-basket').text(`кол-во позиций: ${response.length}`);
             let total = response.reduce((pv, cv) => {
               return pv + +cv.count_on_order;
             }, 0);
@@ -515,7 +573,7 @@ class TicketMan {
           const userId = this.vapee.userId;
           const response = await this.vapee.basketMan.removeProduct(userId, id);
           if (Array.isArray(response)) {
-            $('#count-basket').text(`в корзине: ${response.length}`);
+            $('#count-basket').text(`кол-во позиций: ${response.length}`);
             let total = response.reduce((pv, cv) => {
               return pv + +cv.count_on_order;
             }, 0);

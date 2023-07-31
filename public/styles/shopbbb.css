@@ -118,6 +118,43 @@ body {
   max-width: 170px;
  }
 
+/* -------------------------- finded-categories block */
+
+.finded-characteristics {
+  display: flex;
+  flex-flow: row wrap;
+  background-color: #dddddd62;
+  position: fixed;
+  margin-top: 20px;
+  min-height: 30px;
+  width: 100%;
+}
+
+.label-find-char {
+  display: flex;
+  height: 15px;
+  padding: 4px;
+  margin: 1px;
+  flex-flow: row nowrap;
+  border-radius: 10px;
+  border: 1px solid rgb(110, 110, 110);
+  align-items: center;
+  background-color: #c6c6c6;
+}
+
+.title-find-char {
+  font-size: 0.7em;
+}
+
+.remove-find-char {
+  margin-left: 4px;
+  border-radius: 50%;
+  background-color: #4e4e4e;
+  color: whitesmoke;
+
+  font-size: 0.8em;
+}
+
 
  .about{
   width: 120px;
@@ -160,6 +197,8 @@ body {
   color: #202020;
   cursor: pointer;
  }
+
+ 
 
  .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
   border: 1px solid #6285ec;
@@ -246,6 +285,21 @@ body {
   top: 0;
  } 
 
+ .select-cats {
+  padding: 0;
+  margin: 0;
+ }
+
+ .list-cats {
+  font-size: 0.8em;
+  width: 100%;
+  color: darkgreen;
+ }
+
+ .list-cats p {
+  font-size: 0.8em;
+ }
+
  
  
 /* ------------- message --------------------- */
@@ -316,4 +370,6 @@ body {
 }
  
 
- 
+ /* .ui-accordion-content-active {
+  height: 0;
+} */
