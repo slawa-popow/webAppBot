@@ -88,14 +88,32 @@ class MysqlClient implements SomeDataBase {
     async findByCharacts(data: FrontInputData): Promise<Product[]> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
-         
+        const brands = data.brands;
+        let querySearch: string[] = [];
+        let query: string = '';
+        
         const nameChars: string = data.characteristics.map((v: string) => {
             return `характеристики LIKE "%${v}%"`;
-        }).join(' AND ');
+        }).join(' OR ');
+
+        if (data.brands.length > 0 && data.characteristics.length > 0) {
+            for (let b of brands) {
+                querySearch.push(`(бренд LIKE "%${b}%" AND (${nameChars}))`);
+            } 
+            query = querySearch.join(' OR ');
+
+        } else if (data.brands.length === 0 && data.characteristics.length > 0) {
+            query = nameChars;
+        } else if (data.brands.length > 0 && data.characteristics.length === 0) {
+            query = data.brands.map((v: string) => {
+                return `бренд LIKE "%${v}%"`
+            }).join(' OR ');
+        }
+        
         try {
             const qfind = await promCon(`
             SELECT * FROM Товары WHERE 
-            ${nameChars}
+            ${query}
             AND LCASE(группы)="${data.category}";
             `) as Product[];
             
@@ -114,7 +132,7 @@ class MysqlClient implements SomeDataBase {
     async getAllCategory(): Promise<AllCategory | null> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
-        let responseCats: CatsHaracters = {categories: [], characteristics: {}};
+        let responseCats: CatsHaracters = {categories: [], characteristics: {}, brands: {}};
         try {
             const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(группы, "/", 1) 
                                           FROM ${this.table.allprods};`) as Record<string, string>[];
@@ -144,10 +162,19 @@ class MysqlClient implements SomeDataBase {
                         });
                     }
                 });
-                        
+
+                const brandsByCatego = await promCon(`
+                    SELECT DISTINCT бренд
+                    FROM Товары
+                    WHERE группы LIKE "%${v}%";
+                `) as {[key: string]: string}[];
+                
+                responseCats.brands[v] = [...brandsByCatego.map(val => {
+                    return val['бренд'];
+                })];      
                 responseCats.characteristics[v] = Array.from(setCharactsQuery) as string[];
             } 
-        
+              
             return responseCats;
 
         } catch {

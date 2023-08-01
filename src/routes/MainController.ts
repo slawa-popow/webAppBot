@@ -23,7 +23,7 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('indexbbb', {layout: 'mainbbb'});   
+        return response.status(200).render('indexOI', {layout: 'mainOI'});   
     }
 
 
@@ -65,7 +65,6 @@ class MainController {
 
 
     async searchByCharacts(request: Request, response: Response) {
-        
         const data: FrontInputData = request.body;
         const result = await db.findByCharacts(data);
         response.status(200).json(result)

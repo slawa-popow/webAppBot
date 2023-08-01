@@ -10,6 +10,7 @@ export class TicketMan {
         this.forRequest = {  // поиск по хар-кам
             category: '',
             characteristics: [],
+            brands: [],
             searchText: ''
         };
     }
@@ -69,35 +70,54 @@ export class TicketMan {
      */
     async makeTab() {
         
-        $( "#tabs" ).tabs({collapsible: true, });
+        $( "#tabs" ).tabs({collapsible: true, activate: function(e, ui) {
+            $('.finded-characteristics').css('margin-top', '0');
+        }});
         $('#cnt').on("click", (e) => {
             $('#tabs').tabs( "option", "active", 10 );
         });
         $( function() {
             $( "input" ).checkboxradio();
         });
-        // query_id=AAHrOrtzAAAAAOs6u3On2cDm&user=%7B%22id%22%3A1941650155%2C%22first_name%22%3A%22Slava%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22Pwg90%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1690386445&hash=268489f1c090ca1c40483be3ea489cdf77fba5c618b6c5fe2c29910a1a5ffe15
-        /*   крепкие/кислые/Электронные сигареты   */
 
         const result = await this.hc.getCategory();
         const cats = result.categories;
         const characts = result.characteristics;
-                 
+        const brands = result.brands;
+        
+        
+
         let sortCats = [...cats].sort();
         if (cats.length > 0) {
             $('#set-cats').append(`${sortCats.map( (v) => {
                 const chrs = characts[v]; // array characteristics from result.characteristics
                 const idName = v.replace(/\s+/g, '_');
+                const brandsCat = brands[v];  // array brands from result.brands
+                
+                let checkboxBrands = brandsCat.map((nameBrand, i) => {
+                    
+                    let color = (i % 2 === 0) ? '#f3f3f3': 'white';
+                    const checkBlock = `
+                        <div id="brands-block" style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
+                        <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameBrand}</label>
+                        <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameBrand}">
+                        </div>
+                    `;
+                    return checkBlock;
+                }).join('\n');
+
                 let checkboxs = chrs.filter(a => {return a.length > 0})
                 .map((nameCharact, i) => {
                     let color = (i % 2 === 0) ? '#f3f3f3': 'white';
                     // let idNameCharact = 'cbx_'+nameCharact.replace(/[. :?*+^$[\]\\(){}|-]+/g, '_');
+
                     const checkBlock = `
-                        <div style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
+                    
+                        <div id="cats-block" style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
                         <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameCharact}</label>
                         <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameCharact}">
                         </div>
-                        
+                    
                     `;
                    
                     
@@ -108,14 +128,21 @@ export class TicketMan {
 
                 const searchForms =  `
                 <h3>${v}</h3>
-                <div >
+                <div>
                 <p>Выбери критерии поиска:</p>
                     <form name=form-${sumbitId}>
                         <fieldset>
+                            <legend> Бренды: </legend>
+                            ${checkboxBrands}
+                            
+                        </fieldset>
+
+                        <fieldset>
                             <legend> Характеристики: </legend>
                             ${checkboxs}
-                            <input type="text" id="setText-${sumbitId}" name="${idName}"/>
+                            
                         </fieldset>
+
                     </form>
                     <button id="submit-${sumbitId}">Поиск</button>
                 </div>
@@ -148,6 +175,7 @@ export class TicketMan {
             return +$(window).height()-220;
         } );
         $('.set-cats').css('overflow-y', 'scroll');
+        
 
         $('input[type="checkbox"]').on('change', async (e) => {  // обработчик галочек
             const buttonId = e.target.id.replace(/[. :?*+^$[\]\\(){}|-]/g, '_');
@@ -157,34 +185,54 @@ export class TicketMan {
                     <button id="remove-${buttonId}" class="remove-find-char">x</button>
                 </div> `;
 
-           
+             
 
             if (e.target.checked === false) {
-                const indxDel = this.forRequest.characteristics.findIndex(v => {
-                    return v === e.target.id;
-                });
-                 
-                if (indxDel >= 0) {
-                    
-                    delete this.forRequest.characteristics[indxDel];
-                    console.log('not ', this.forRequest.characteristics, e.target.id, indxDel);
-                }
+                let indxDel;
+                if (e.target.parentNode.id === 'cats-block') {
+                    indxDel = this.forRequest.characteristics.findIndex(v => {
+                        return v === e.target.id;
+                    });
+                    if (indxDel >= 0) {
+                        delete this.forRequest.characteristics[indxDel];
+                    }
+                } else if (e.target.parentNode.id === 'brands-block') {
+                    indxDel = this.forRequest.brands.findIndex(v => {
+                        return v === e.target.id;
+                    });
+                    if (indxDel >= 0) {
+                        delete this.forRequest.brands[indxDel];
+                    }
+                } 
+                
                 $(`#label-${buttonId}`).remove(); 
             } else {
                 $(`#finded-characteristics`).append(labelChar);
-                this.forRequest.characteristics.push(e.target.id);
-                console.log('is ', this.forRequest.characteristics, e.target.id);
+                if (e.target.parentNode.id === 'cats-block') {
+                    this.forRequest.characteristics.push(e.target.id);
+                } else if (e.target.parentNode.id === 'brands-block') {
+                    this.forRequest.brands.push(e.target.id);
+                }
             }
 
             $(`#remove-${buttonId}`).on('click', (evn) => {  // обработчик удаления метки хар-ки
                 e.target.checked = false;
                 $(`#label-${buttonId}`).remove();
-                const indxDel = this.forRequest.characteristics.findIndex(v => {
-                    return v === e.target.id;
-                });
-                if (indxDel >= 0) {
-                    delete this.forRequest.characteristics[indxDel];
-                    console.log(this.forRequest.characteristics);
+                let indxDel;
+                if (e.target.parentNode.id === 'cats-block') {
+                    indxDel = this.forRequest.characteristics.findIndex(v => {
+                        return v === e.target.id;
+                    });
+                    if (indxDel >= 0) {
+                        delete this.forRequest.characteristics[indxDel];
+                    }
+                } else if (e.target.parentNode.id === 'brands-block') {
+                    indxDel = this.forRequest.brands.findIndex(v => {
+                        return v === e.target.id;
+                    });
+                    if (indxDel >= 0) {
+                        delete this.forRequest.brands[indxDel];
+                    }
                 }
             });
             
@@ -199,11 +247,10 @@ export class TicketMan {
            $(`#submit-${id}`).on('click', async () => {  // action_on_click_button
             const idform = 'form-' + id;
             const elemsForm = document.forms[idform].elements[id];
-            const inputField = document.getElementById(`setText-${id}`);
-           
-            const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
-            (validText) ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
-
+            
+            // const inputField = document.getElementById(`setText-${id}`);
+            // const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
+            // (validText) ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
             // $('#select-cats').text(`Выбрано характеристик: ${forRequest.characteristics.length}`)
             // $('#list-cats').text(forRequest.characteristics.join(' & '));
 
@@ -211,8 +258,9 @@ export class TicketMan {
             $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
             this.msg('загрузка...', this.forRequest.category);
 
-            this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0})
-            console.log(this.forRequest);
+            this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
+            this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
+           
             const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
             $('#tabs').tabs( "option", "active", 10000 );
             
@@ -220,6 +268,8 @@ export class TicketMan {
                 await this.makeProductTickets(result); // array div's
             } else {
                 $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                $(`#total-prods`).text('Найдено: 0');
+                $('.finded-characteristics').css('margin-top', '40px');
                 $('#alert-message').remove(); // убрать окно загрузки
             }
             
@@ -253,6 +303,8 @@ export class TicketMan {
      * @param {Array} arrObjs 
      */
     async makeProductTickets(arrObjs) {
+        $(`#total-prods`).text(`Найдено: ${arrObjs.length}`);
+        $('.finded-characteristics').css('margin-top', '0');
         for (let v of arrObjs) {
             const vprice = this.getPriceMap(v);
             let htmlPrice = '';
