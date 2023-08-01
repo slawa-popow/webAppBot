@@ -124,7 +124,6 @@ body {
   display: flex;
   flex-flow: row wrap;
   position: fixed;
-  
   min-height: 30px;
   width: 100%;
 }
@@ -372,3 +371,169 @@ body {
  /* .ui-accordion-content-active {
   height: 0;
 } */
+
+/* ----------- button  */
+
+.button-find {
+  margin: 15px;
+}
+
+
+.button-find {
+  align-items: center;
+  appearance: none;
+  background-color: #FCFCFD;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395A;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 26px;
+  padding-right: 26px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+}
+
+.button-find:focus {
+  box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+}
+
+.button-find:hover {
+  box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+.button-find:active {
+  box-shadow: #D6D6E7 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+
+
+/* CSS */
+.button-backTg {
+  appearance: none;
+  backface-visibility: hidden;
+  background-color: #27ae60;
+  border-radius: 8px;
+  border-style: none;
+  box-shadow: rgba(39, 174, 96, .15) 0 4px 9px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Inter,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1;
+  outline: none;
+  overflow: hidden;
+  padding: 13px 10px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transform: translate3d(0, 0, 0);
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.button-backTg:hover {
+  background-color: #1e8449;
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: .35s;
+}
+
+.button-backTg:active {
+  transform: translateY(2px);
+  transition-duration: .35s;
+}
+
+.button-backTg:hover {
+  box-shadow: rgba(39, 174, 96, .2) 0 6px 12px;
+}
+
+/* ---------------------- корзина */
+.prd {
+  display: flex;
+  flex-flow: column wrap;
+  margin: 10px 0;
+  max-width: 380px;
+  border: 1px solid #1e8449;
+}
+.cartProd {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 10px 0;
+   
+   
+}
+
+.info-cartProd {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.key-info-catrProd, .value-info-cartProd {
+  font-size: 0.6em;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  justify-content: center;
+  align-items: flex-start;   
+}
+
+.key-info-catrProd p, .value-info-cartProd p {
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0;
+  padding: 4px;
+
+}
+
+.key-info-catrProd {
+  width: 100px;
+}
+ 
+
+
+.remove-product {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 8px 0;
+} 
+
+.paysum {
+  font-weight: bold;
+  color: green;
+}
+
+
+
+

@@ -68,10 +68,50 @@ export class TicketMan {
      * Создать виджет Tab jQuery
      * heightStyle: "fill"
      */
+
+    async viewCars() {
+
+        for (let prod of this.vapee.basketMan.userBasket) {
+            const cartProd = `
+                <div class="prd">
+                <div id="cartProd" class="cartProd">
+    
+                <div id="info-cartProd" class="info-cartProd">
+                    <div id="key-info-catrProd" class="key-info-catrProd">
+                        <p>наименование</p>
+                        <p>категория</p>
+                        <p>бренд</p>
+                        <p>кол-во</p>
+                        <p>стоимость</p>
+                    </div>
+                    <div id="value-info-cartProd" class="value-info-cartProd">
+                        <p>${prod.name_good || ''}</p>
+                        <p>${prod.category || ''}</p>
+                        <p>${prod.brand || ''}</p>
+                        <p>${prod.count_on_order || ''}</p>
+                        <p class="paysum">${prod.sum_position}</p>
+                    </div>
+                </div>
+                </div>
+                <div id="remove-product" class="remove-product">
+                <button id="button-remove-product-from-cart-${prod.id}">убрать</button>
+                </div>
+            </div>  
+            `;
+
+            $('#in-basket').append(cartProd);
+        }
+    }
+
     async makeTab() {
         
-        $( "#tabs" ).tabs({collapsible: true, activate: function(e, ui) {
+        $( "#tabs" ).tabs({collapsible: true, activate: async (e, ui) => {
             $('.finded-characteristics').css('margin-top', '0');
+            
+            if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
+                console.log(this.vapee.basketMan.userBasket);
+                await this.viewCars();
+            }
         }});
         $('#cnt').on("click", (e) => {
             $('#tabs').tabs( "option", "active", 10 );
@@ -144,7 +184,7 @@ export class TicketMan {
                         </fieldset>
 
                     </form>
-                    <button id="submit-${sumbitId}">Поиск</button>
+                    <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                 </div>
                 `;
                  

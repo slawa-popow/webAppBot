@@ -28,6 +28,16 @@ const URL = prodURL;
         hostConnector 
     );
     
+    function startStyle() {
+        $('.set-cats').css('max-height', () => {
+            return +$(window).height()-220;
+        } );
+        $('.set-cats').css('overflow-y', 'scroll');
+        $('#in-basket').css('max-height', () => {
+            return +$(window).height()-200;
+        });
+        $('#in-basket').css('overflow-y', 'scroll');
+    }
     vapee.init(); 
 
     $('#close').on('click', (e) => { 
@@ -35,11 +45,10 @@ const URL = prodURL;
     });
 
     $( window ).on( "resize", () => {
-        $('.set-cats').css('max-height', () => {
-            return +$(window).height()-220;
-        } );
-        $('.set-cats').css('overflow-y', 'scroll');
+        startStyle();
     });
+
+    startStyle();
     
     
 

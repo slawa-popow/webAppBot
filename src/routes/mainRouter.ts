@@ -15,4 +15,4 @@ mainRouter.post('/getFindByCharacteristics', validUsr, mainController.searchByCh
 //
 // mainRouter.get('/Djiugurda', mainController.fromMySklad);
 
-export { mainRouter }
+export { mainRouter }; 

@@ -347,11 +347,47 @@ class TicketMan {
    * Создать виджет Tab jQuery
    * heightStyle: "fill"
    */
+
+  async viewCars() {
+    for (let prod of this.vapee.basketMan.userBasket) {
+      const cartProd = `
+                <div class="prd">
+                <div id="cartProd" class="cartProd">
+    
+                <div id="info-cartProd" class="info-cartProd">
+                    <div id="key-info-catrProd" class="key-info-catrProd">
+                        <p>наименование</p>
+                        <p>категория</p>
+                        <p>бренд</p>
+                        <p>кол-во</p>
+                        <p>стоимость</p>
+                    </div>
+                    <div id="value-info-cartProd" class="value-info-cartProd">
+                        <p>${prod.name_good || ''}</p>
+                        <p>${prod.category || ''}</p>
+                        <p>${prod.brand || ''}</p>
+                        <p>${prod.count_on_order || ''}</p>
+                        <p class="paysum">${prod.sum_position}</p>
+                    </div>
+                </div>
+                </div>
+                <div id="remove-product" class="remove-product">
+                <button id="button-remove-product-from-cart-${prod.id}">убрать</button>
+                </div>
+            </div>  
+            `;
+      $('#in-basket').append(cartProd);
+    }
+  }
   async makeTab() {
     $("#tabs").tabs({
       collapsible: true,
-      activate: function (e, ui) {
+      activate: async (e, ui) => {
         $('.finded-characteristics').css('margin-top', '0');
+        if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
+          console.log(this.vapee.basketMan.userBasket);
+          await this.viewCars();
+        }
       }
     });
     $('#cnt').on("click", e => {
@@ -416,7 +452,7 @@ class TicketMan {
                         </fieldset>
 
                     </form>
-                    <button id="submit-${sumbitId}">Поиск</button>
+                    <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                 </div>
                 `;
         return searchForms;
@@ -37968,16 +38004,24 @@ const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderM
 const basketMan = new _src_BasketMan__WEBPACK_IMPORTED_MODULE_7__.BasketMan(hostConnector);
 const ticketMan = new _src_TicketMan__WEBPACK_IMPORTED_MODULE_8__.TicketMan(hostConnector);
 const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basketMan, ticketMan, hostConnector);
+function startStyle() {
+  $('.set-cats').css('max-height', () => {
+    return +$(window).height() - 220;
+  });
+  $('.set-cats').css('overflow-y', 'scroll');
+  $('#in-basket').css('max-height', () => {
+    return +$(window).height() - 200;
+  });
+  $('#in-basket').css('overflow-y', 'scroll');
+}
 vapee.init();
 $('#close').on('click', e => {
   window.Telegram.WebApp.sendData("order-off");
 });
 $(window).on("resize", () => {
-  $('.set-cats').css('max-height', () => {
-    return +$(window).height() - 220;
-  });
-  $('.set-cats').css('overflow-y', 'scroll');
+  startStyle();
 });
+startStyle();
 
 // -------------------------------------------------------------------------
 })();

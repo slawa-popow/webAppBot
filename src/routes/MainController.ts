@@ -23,8 +23,8 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('indexOI', {layout: 'mainOI'});   
-    }
+        return response.status(200).render('indexJ', {layout: 'mainJ'});   
+    } 
 
 
     async getUserId(request: Request, response: Response) { 
