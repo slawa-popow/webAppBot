@@ -3,6 +3,7 @@ import axios from "axios";
 export class HostConnector {
 
     api = {
+        deleteProduct: 'deleteProduct',
         getCats: 'getCategory',
         getUsId: 'getUsid',
         getTenProd: 'getTenProd',

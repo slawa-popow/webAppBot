@@ -70,7 +70,7 @@ export class TicketMan {
      */
 
     async viewCars() {
-
+        $(`#finded-characteristics`).empty();
         for (let prod of this.vapee.basketMan.userBasket) {
             const cartProd = `
                 <div class="prd">
@@ -94,12 +94,31 @@ export class TicketMan {
                 </div>
                 </div>
                 <div id="remove-product" class="remove-product">
-                <button id="button-remove-product-from-cart-${prod.id}">убрать</button>
+                <button id="button-remove-product-from-cart-${prod.product_id}">убрать</button>
                 </div>
             </div>  
             `;
 
             $('#in-basket').append(cartProd);
+            $(`#button-remove-product-from-cart-${prod.product_id}`).on('click', async (e) => {
+                let rawid = e.target.id.split('-').reverse();
+                let id = rawid[0];
+                
+                const userId = this.vapee.userId;
+                const response = await this.vapee.basketMan.removeProduct(userId, id);
+
+                if (Array.isArray(response)) {
+                    $('#count-basket').text(`кол-во позиций: ${response.length}`);
+                    let total = response.reduce((pv, cv) => {
+                        return pv + (+cv.count_on_order);
+                    }, 0);
+                    $('#total').text(`всего товаров: ${total}`);
+                    $('#in-basket').empty();
+                    this.viewCars();
+                } else {
+                    this.clearContent(response);
+                }
+            });
         }
     }
 

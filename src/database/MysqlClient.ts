@@ -229,10 +229,10 @@ class MysqlClient implements SomeDataBase {
 
                     if (Array.isArray(findProductWithId) && findProductWithId.length === 0) {
                             await promCon(`
-                            INSERT INTO ${addProd.userId} (user_id, product_id, uniq_token, datetime, category, brand,
+                            INSERT INTO ${addProd.userId} (user_id, product_id, photo, uniq_token, datetime, category, brand,
                                 name_good, characteristic, count_on_stock, count_on_order, price_from_1to2, price_from_3to4, price_from_5to9,
                                 price_from_10to29, price_from_30to69, price_from_70to149, price_from_150, order_status)
-                            VALUES ("${usid}", "${addProd.idProduct}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
+                            VALUES ("${usid}", "${addProd.idProduct}", "${p['фото']}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
                                 "${p["характеристики"].replace(/"/g, '')}", "${p["количество_на_складе"] || 0}", "1",  "${p["цена_от_1_до_2"] || 0}", "${p["цена_от_3_до_4"] || 0}",
                                 ${p["цена_от_5_до_9"] || 0}, ${p["цена_от_10_до_29"] || 0}, ${p["цена_от_30_до_69"] || 0}, ${p["цена_от_70_до_149"] || 0},
                                 "${p["цена_от_150"] || 0}", "${StatusOrder.IN_BASKET}");
