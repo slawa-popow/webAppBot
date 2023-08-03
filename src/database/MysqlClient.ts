@@ -136,7 +136,7 @@ class MysqlClient implements SomeDataBase {
         const promCon = promisify(connect.query).bind(connect);
         let responseCats: CatsHaracters = {categories: [], characteristics: {}, brands: {}};
         try {
-            const result =  await promCon(`SELECT DISTINCT группы 
+            const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(группы, "/", 1) 
                                           FROM ${this.table.allprods};`) as Record<string, string>[];
 
            
@@ -154,7 +154,7 @@ class MysqlClient implements SomeDataBase {
             for (let v of rows) {
                 
                 const charactsQuery = await promCon(`
-                SELECT DISTINCT LCASE(характеристики) AS characteristics FROM Товары WHERE LCASE(характеристики) LIKE "%${v}%"; 
+                SELECT DISTINCT (характеристики) AS characteristics FROM Товары WHERE характеристики LIKE "%${v}%"; 
                 `) as RowDataPacketCharacteristic[];
                 let setCharactsQuery = new Set();
                 charactsQuery.forEach(v => {

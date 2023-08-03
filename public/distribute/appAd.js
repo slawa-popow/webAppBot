@@ -568,7 +568,7 @@ class TicketMan {
           return val && val.length > 0;
         });
         const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
-        console.log(this.forRequest, result);
+
         //$('#tabs').tabs( "option", "active", 10000 );
 
         if (result.length > 0) {
