@@ -23,7 +23,7 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('DindexBB', {layout: 'DmainBB'});   
+        return response.status(200).render('indexCV', {layout: 'mainCV'});   
     } 
 
 

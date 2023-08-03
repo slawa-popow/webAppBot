@@ -278,7 +278,7 @@ body {
  }
 
  .settings-widget {
-  width: auto;
+  width: 100%;
   position: fixed;
   top: 0;
  } 

@@ -298,7 +298,7 @@ export class TicketMan {
                 }
                 // dyn request
                 $('#cnt').remove();
-                $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+                $('#content').append('<div class="Cart-Container" id="cnt"> </div>'); 
                 this.msg('загрузка...', this.forRequest.category);
 
                 this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
@@ -467,7 +467,9 @@ export class TicketMan {
             `);
             
             $('#cnt').append(ticket);
-    
+            $('#cnt').on("click", (e) => {
+                $('#tabs').tabs( "option", "active", 10 );
+            });
             (async (id, onStock)=>{
                 
                 $( `#plus_${id}` ).on( "click", async (e) => {

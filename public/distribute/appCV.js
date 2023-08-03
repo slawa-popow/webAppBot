@@ -723,6 +723,9 @@ class TicketMan {
                 </div>
             `);
       $('#cnt').append(ticket);
+      $('#cnt').on("click", e => {
+        $('#tabs').tabs("option", "active", 10);
+      });
       (async (id, onStock) => {
         $(`#plus_${id}`).on("click", async e => {
           let currCnt = $(`#count_${id}`).text();
