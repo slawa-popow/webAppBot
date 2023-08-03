@@ -34,7 +34,7 @@ const URL = prodURL;
         } );
         $('.set-cats').css('overflow-y', 'scroll');
         $('#in-basket').css('max-height', () => {
-            return +$(window).height()-200;
+            return +$(window).height()-190;
         });
         $('#in-basket').css('overflow-y', 'scroll');
     }

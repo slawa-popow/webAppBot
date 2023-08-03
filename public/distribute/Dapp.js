@@ -351,6 +351,8 @@ class TicketMan {
 
   async viewCars() {
     $(`#finded-characteristics`).empty();
+    $('#in-basket').empty();
+    $('#in-basket').css('overflow-y', 'scroll');
     for (let prod of this.vapee.basketMan.userBasket) {
       const cartProd = `
                 <div class="prd">
@@ -404,7 +406,6 @@ class TicketMan {
       activate: async (e, ui) => {
         $('.finded-characteristics').css('margin-top', '0');
         if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
-          console.log(this.vapee.basketMan.userBasket);
           await this.viewCars();
         }
       }
@@ -457,13 +458,14 @@ class TicketMan {
                 <h3>${v}</h3>
                 <div>
                 <p>Выбери критерии поиска:</p>
+                <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                     <form name=form-${sumbitId}>
                         <fieldset>
                             <legend> Бренды: </legend>
                             ${checkboxBrands}
                             
                         </fieldset>
-
+                        <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                         <fieldset>
                             <legend> Характеристики: </legend>
                             ${checkboxs}
@@ -526,6 +528,28 @@ class TicketMan {
           }
         }
         $(`#label-${buttonId}`).remove();
+
+        // dyn request
+        $('#cnt').remove();
+        $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+        this.msg('загрузка...', this.forRequest.category);
+        this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {
+          return val && val.length > 0;
+        });
+        this.forRequest.brands = this.forRequest.brands.filter(val => {
+          return val && val.length > 0;
+        });
+        const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+        //$('#tabs').tabs( "option", "active", 10000 );
+
+        if (result.length > 0) {
+          await this.makeProductTickets(result); // array div's
+        } else {
+          $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+          $(`#total-prods`).text('Найдено: 0');
+          $('.finded-characteristics').css('margin-top', '40px');
+          $('#alert-message').remove(); // убрать окно загрузки
+        }
       } else {
         $(`#finded-characteristics`).append(labelChar);
         if (e.target.parentNode.id === 'cats-block') {
@@ -533,8 +557,30 @@ class TicketMan {
         } else if (e.target.parentNode.id === 'brands-block') {
           this.forRequest.brands.push(e.target.id);
         }
+        // dyn request
+        $('#cnt').remove();
+        $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+        this.msg('загрузка...', this.forRequest.category);
+        this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {
+          return val && val.length > 0;
+        });
+        this.forRequest.brands = this.forRequest.brands.filter(val => {
+          return val && val.length > 0;
+        });
+        const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+        //$('#tabs').tabs( "option", "active", 10000 );
+
+        if (result.length > 0) {
+          await this.makeProductTickets(result); // array div's
+        } else {
+          $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+          $(`#total-prods`).text('Найдено: 0');
+          $('.finded-characteristics').css('margin-top', '40px');
+          $('#alert-message').remove(); // убрать окно загрузки
+        }
       }
-      $(`#remove-${buttonId}`).on('click', evn => {
+
+      $(`#remove-${buttonId}`).on('click', async evn => {
         // обработчик удаления метки хар-ки
         e.target.checked = false;
         $(`#label-${buttonId}`).remove();
@@ -554,8 +600,30 @@ class TicketMan {
             delete this.forRequest.brands[indxDel];
           }
         }
+        // dyn request
+        $('#cnt').remove();
+        $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+        this.msg('загрузка...', this.forRequest.category);
+        this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {
+          return val && val.length > 0;
+        });
+        this.forRequest.brands = this.forRequest.brands.filter(val => {
+          return val && val.length > 0;
+        });
+        const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+        //$('#tabs').tabs( "option", "active", 10000 );
+
+        if (result.length > 0) {
+          await this.makeProductTickets(result); // array div's
+        } else {
+          $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+          $(`#total-prods`).text('Найдено: 0');
+          $('.finded-characteristics').css('margin-top', '40px');
+          $('#alert-message').remove(); // убрать окно загрузки
+        }
       });
     });
+
     for (let v of sortCats) {
       const id = v.replace(/\s+/g, '_');
       $(`#submit-${id}`).on('click', async () => {
@@ -622,6 +690,7 @@ class TicketMan {
           htmlPrice += `<p class='subtitle'> <span class="from">${name} </span><span class="summa"> ${price}</span></p>`;
         }
       }
+      // console.log(v)
       const vid = v.id;
       const count_on_stock = +v['количество_на_складе'] || 0;
       const ticket = $(`
@@ -644,7 +713,7 @@ class TicketMan {
                             <div id=plus_${vid} class='btn btn-plus'>+</div>
                         </div>
                         <div class='about'>
-                            <p class='title'>${v['бренд'] || ''}</p>
+                            <p class='title'>${v['наименование'] || ''}</p>
                             <p class="title">В наличии:</p>
                             <p class="subtitle">${count_on_stock}</p>
                             <p class="subtitle, subtitle-chars">${v['характеристики']}</p>
@@ -38029,7 +38098,7 @@ function startStyle() {
   });
   $('.set-cats').css('overflow-y', 'scroll');
   $('#in-basket').css('max-height', () => {
-    return +$(window).height() - 200;
+    return +$(window).height() - 190;
   });
   $('#in-basket').css('overflow-y', 'scroll');
 }

@@ -71,6 +71,9 @@ export class TicketMan {
 
     async viewCars() {
         $(`#finded-characteristics`).empty();
+        $('#in-basket').empty();
+
+        $('#in-basket').css('overflow-y', 'scroll');
         for (let prod of this.vapee.basketMan.userBasket) {
             const cartProd = `
                 <div class="prd">
@@ -114,6 +117,7 @@ export class TicketMan {
                     }, 0);
                     $('#total').text(`всего товаров: ${total}`);
                     $('#in-basket').empty();
+                   
                     this.viewCars();
                 } else {
                     this.clearContent(response);
@@ -128,7 +132,6 @@ export class TicketMan {
             $('.finded-characteristics').css('margin-top', '0');
             
             if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
-                console.log(this.vapee.basketMan.userBasket);
                 await this.viewCars();
             }
         }});
@@ -189,13 +192,14 @@ export class TicketMan {
                 <h3>${v}</h3>
                 <div>
                 <p>Выбери критерии поиска:</p>
+                <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                     <form name=form-${sumbitId}>
                         <fieldset>
                             <legend> Бренды: </legend>
                             ${checkboxBrands}
                             
                         </fieldset>
-
+                        <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                         <fieldset>
                             <legend> Характеристики: </legend>
                             ${checkboxs}
@@ -265,6 +269,26 @@ export class TicketMan {
                 } 
                 
                 $(`#label-${buttonId}`).remove(); 
+
+                // dyn request
+                $('#cnt').remove();
+                $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+                this.msg('загрузка...', this.forRequest.category);
+
+                this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
+                this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
+                const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+                //$('#tabs').tabs( "option", "active", 10000 );
+                
+                if (result.length > 0) {
+                    await this.makeProductTickets(result); // array div's
+                } else {
+                    $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                    $(`#total-prods`).text('Найдено: 0');
+                    $('.finded-characteristics').css('margin-top', '40px');
+                    $('#alert-message').remove(); // убрать окно загрузки
+                }
+
             } else {
                 $(`#finded-characteristics`).append(labelChar);
                 if (e.target.parentNode.id === 'cats-block') {
@@ -272,9 +296,28 @@ export class TicketMan {
                 } else if (e.target.parentNode.id === 'brands-block') {
                     this.forRequest.brands.push(e.target.id);
                 }
+                // dyn request
+                $('#cnt').remove();
+                $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+                this.msg('загрузка...', this.forRequest.category);
+
+                this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
+                this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
+                const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+                //$('#tabs').tabs( "option", "active", 10000 );
+                
+                if (result.length > 0) {
+                    await this.makeProductTickets(result); // array div's
+                } else {
+                    $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                    $(`#total-prods`).text('Найдено: 0');
+                    $('.finded-characteristics').css('margin-top', '40px');
+                    $('#alert-message').remove(); // убрать окно загрузки
+                }
+                
             }
 
-            $(`#remove-${buttonId}`).on('click', (evn) => {  // обработчик удаления метки хар-ки
+            $(`#remove-${buttonId}`).on('click', async (evn) => {  // обработчик удаления метки хар-ки
                 e.target.checked = false;
                 $(`#label-${buttonId}`).remove();
                 let indxDel;
@@ -293,6 +336,24 @@ export class TicketMan {
                         delete this.forRequest.brands[indxDel];
                     }
                 }
+                // dyn request
+                $('#cnt').remove();
+                $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+                this.msg('загрузка...', this.forRequest.category);
+
+                this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
+                this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
+                const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+                //$('#tabs').tabs( "option", "active", 10000 );
+                
+                if (result.length > 0) {
+                    await this.makeProductTickets(result); // array div's
+                } else {
+                    $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                    $(`#total-prods`).text('Найдено: 0');
+                    $('.finded-characteristics').css('margin-top', '40px');
+                    $('#alert-message').remove(); // убрать окно загрузки
+                }
             });
             
             
@@ -304,35 +365,35 @@ export class TicketMan {
             const id = v.replace(/\s+/g, '_');
 
            $(`#submit-${id}`).on('click', async () => {  // action_on_click_button
-            const idform = 'form-' + id;
-            const elemsForm = document.forms[idform].elements[id];
-            
-            // const inputField = document.getElementById(`setText-${id}`);
-            // const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
-            // (validText) ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
-            // $('#select-cats').text(`Выбрано характеристик: ${forRequest.characteristics.length}`)
-            // $('#list-cats').text(forRequest.characteristics.join(' & '));
+                const idform = 'form-' + id;
+                const elemsForm = document.forms[idform].elements[id];
+                
+                // const inputField = document.getElementById(`setText-${id}`);
+                // const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
+                // (validText) ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
+                // $('#select-cats').text(`Выбрано характеристик: ${forRequest.characteristics.length}`)
+                // $('#list-cats').text(forRequest.characteristics.join(' & '));
 
-            $('#cnt').remove();
-            $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
-            this.msg('загрузка...', this.forRequest.category);
+                $('#cnt').remove();
+                $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
+                this.msg('загрузка...', this.forRequest.category);
 
-            this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
-            this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
-           
-            const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
-            $('#tabs').tabs( "option", "active", 10000 );
+                this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
+                this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
             
-            if (result.length > 0) {
-                await this.makeProductTickets(result); // array div's
-            } else {
-                $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
-                $(`#total-prods`).text('Найдено: 0');
-                $('.finded-characteristics').css('margin-top', '40px');
-                $('#alert-message').remove(); // убрать окно загрузки
-            }
-            
-        }); // end_action_on_click_button
+                const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+                $('#tabs').tabs( "option", "active", 10000 );
+                
+                if (result.length > 0) {
+                    await this.makeProductTickets(result); // array div's
+                } else {
+                    $('#cnt').append(`<div style="width: 100%;"><p>Ничего не найдено</p></div>`);
+                    $(`#total-prods`).text('Найдено: 0');
+                    $('.finded-characteristics').css('margin-top', '40px');
+                    $('#alert-message').remove(); // убрать окно загрузки
+                }
+                
+            }); // end_action_on_click_button
         }
          
         
@@ -372,6 +433,7 @@ export class TicketMan {
                 htmlPrice += `<p class='subtitle'> <span class="from">${name} </span><span class="summa"> ${price}</span></p>`;
                 }
             }
+            // console.log(v)
             const vid = v.id;
             const count_on_stock = +v['количество_на_складе'] || 0;
             const ticket = $(`
@@ -394,7 +456,7 @@ export class TicketMan {
                             <div id=plus_${vid} class='btn btn-plus'>+</div>
                         </div>
                         <div class='about'>
-                            <p class='title'>${v['бренд'] || ''}</p>
+                            <p class='title'>${v['наименование'] || ''}</p>
                             <p class="title">В наличии:</p>
                             <p class="subtitle">${count_on_stock}</p>
                             <p class="subtitle, subtitle-chars">${v['характеристики']}</p>
