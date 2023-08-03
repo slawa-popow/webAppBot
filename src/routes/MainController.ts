@@ -23,7 +23,7 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('indexre', {layout: 'mainre'});   
+        return response.status(200).render('indexuy', {layout: 'mainuy'});   
     } 
 
 

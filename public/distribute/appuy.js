@@ -424,7 +424,7 @@ class TicketMan {
     if (cats.length > 0) {
       $('#set-cats').append(`${sortCats.map(v => {
         const chrs = characts[v]; // array characteristics from result.characteristics
-        const idName = v.replace(/\s+/g, '_');
+        const idName = v.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
         const brandsCat = brands[v]; // array brands from result.brands
 
         let checkboxBrands = brandsCat.map((nameBrand, i) => {
@@ -453,7 +453,7 @@ class TicketMan {
                     `;
           return checkBlock;
         }).join('\n');
-        const sumbitId = v.replace(/\s+/g, '_');
+        const sumbitId = v.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
         const searchForms = `
                 <h3>${v}</h3>
                 <div>
@@ -504,7 +504,7 @@ class TicketMan {
     $('.set-cats').css('overflow-y', 'scroll');
     $('input[type="checkbox"]').on('change', async e => {
       // обработчик галочек
-      const buttonId = e.target.id.replace(/[. :?*+^$[\]\\(){}|-]/g, '_');
+      const buttonId = e.target.id.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
       const labelChar = `
                 <div id='label-${buttonId}' class="label-find-char">
                     <div id="title-find-char" class="title-find-char">${(this, e.target.id)}</div>
@@ -626,7 +626,7 @@ class TicketMan {
     });
 
     for (let v of sortCats) {
-      const id = v.replace(/\s+/g, '_');
+      const id = v.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
       $(`#submit-${id}`).on('click', async () => {
         // action_on_click_button
         const idform = 'form-' + id;

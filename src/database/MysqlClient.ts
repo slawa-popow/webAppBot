@@ -91,7 +91,7 @@ class MysqlClient implements SomeDataBase {
         const brands = data.brands;
         let querySearch: string[] = [];
         let query: string = ''; 
-        console.log(data)
+        
         const nameChars: string = data.characteristics.map((v: string) => {
             return `характеристики LIKE "%${v}%"`;
         }).join(' OR ');
@@ -116,7 +116,7 @@ class MysqlClient implements SomeDataBase {
             
             const qfind = await promCon(`
             SELECT * FROM Товары WHERE (${query}) AND 
-            группы = "${data.category}";
+            Товары.группы = "${data.category}";
             `) as Product[];
             
             return qfind;
@@ -136,7 +136,7 @@ class MysqlClient implements SomeDataBase {
         const promCon = promisify(connect.query).bind(connect);
         let responseCats: CatsHaracters = {categories: [], characteristics: {}, brands: {}};
         try {
-            const result =  await promCon(`SELECT DISTINCT SUBSTRING_INDEX(группы, "/", 1) 
+            const result =  await promCon(`SELECT DISTINCT группы 
                                           FROM ${this.table.allprods};`) as Record<string, string>[];
 
            
