@@ -90,8 +90,8 @@ class MysqlClient implements SomeDataBase {
         const promCon = promisify(connect.query).bind(connect);
         const brands = data.brands;
         let querySearch: string[] = [];
-        let query: string = '';
-        
+        let query: string = ''; 
+        console.log(data)
         const nameChars: string = data.characteristics.map((v: string) => {
             return `характеристики LIKE "%${v}%"`;
         }).join(' OR ');
@@ -101,6 +101,7 @@ class MysqlClient implements SomeDataBase {
                 querySearch.push(`(бренд LIKE "%${b}%" AND (${nameChars}))`);
             } 
             query = querySearch.join(' OR ');
+            
 
         } else if (data.brands.length === 0 && data.characteristics.length > 0) {
             query = nameChars;
@@ -108,13 +109,14 @@ class MysqlClient implements SomeDataBase {
             query = data.brands.map((v: string) => {
                 return `бренд LIKE "%${v}%"`
             }).join(' OR ');
+            
         }
         
         try {
+            
             const qfind = await promCon(`
-            SELECT * FROM Товары WHERE 
-            ${query}
-            AND LCASE(группы)="${data.category}";
+            SELECT * FROM Товары WHERE (${query}) AND 
+            группы = "${data.category}";
             `) as Product[];
             
             return qfind;
@@ -145,6 +147,8 @@ class MysqlClient implements SomeDataBase {
                 return;
             })as string[];
             
+           
+
             responseCats.categories.push(...rows); // вставим все категории
             // получить все уникальные характеристики по каждой категории
             for (let v of rows) {
@@ -207,6 +211,23 @@ class MysqlClient implements SomeDataBase {
         return [];
     }
 
+    /**
+     * Перерасчет цены в зависимости от кол-ва товаров
+     * @param p товар
+     */
+    async recalcPrice(userId: string): Promise<Product[]> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+        try {
+            const basket = await promCon(`SELECT * FROM ${userId};`) as Product[];
+            console.log(basket);
+
+        } catch (e) { console.log('Error in MysqlClient->recalcPrice()->catch', e) }
+        finally {
+            connect.release();
+        }
+        return [];
+    }
 
     /**
      * Добавить товар в корзину по айди

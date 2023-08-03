@@ -277,6 +277,8 @@ export class TicketMan {
 
                 this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
                 this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
+
+                
                 const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
                 //$('#tabs').tabs( "option", "active", 10000 );
                 
@@ -304,6 +306,7 @@ export class TicketMan {
                 this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {return val && val.length > 0});
                 this.forRequest.brands = this.forRequest.brands.filter(val => {return val && val.length > 0});
                 const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
+                console.log(this.forRequest, result);
                 //$('#tabs').tabs( "option", "active", 10000 );
                 
                 if (result.length > 0) {

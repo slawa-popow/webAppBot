@@ -14,6 +14,8 @@ export interface SomeDataBase {
     getBasketInfo(usid: string): Promise<Product[]>;
     findByCharacts(data: FrontInputData): Promise<Product[]>;
 
+    recalcPrice(userId: string): Promise<Product[]>;
+
     getUuids(): Promise<Product[]>;
     setImageCount(X: string[][]): Promise<boolean>;
 }
