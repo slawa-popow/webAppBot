@@ -159,7 +159,7 @@ body {
   text-align: center;
  }
  .title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: #202020;
  }
@@ -196,7 +196,16 @@ body {
   cursor: pointer;
  }
 
- 
+ .ceni {
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+ }
+ .ceni p {
+  margin: 0;
+  padding: 0;
+ }
 
  .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
   border: 1px solid #6285ec;

@@ -418,12 +418,12 @@ class TicketMan {
     });
     const result = await this.hc.getCategory();
     const cats = result.categories;
-    const characts = result.characteristics;
+    // const characts = result.characteristics;
     const brands = result.brands;
     let sortCats = [...cats].sort();
     if (cats.length > 0) {
       $('#set-cats').append(`${sortCats.map(v => {
-        const chrs = characts[v]; // array characteristics from result.characteristics
+        // const chrs = characts[v]; // array characteristics from result.characteristics
         const idName = v.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
         const brandsCat = brands[v]; // array brands from result.brands
 
@@ -437,22 +437,24 @@ class TicketMan {
                     `;
           return checkBlock;
         }).join('\n');
-        let checkboxs = chrs.filter(a => {
-          return a.length > 0;
-        }).map((nameCharact, i) => {
-          let color = i % 2 === 0 ? '#f3f3f3' : 'white';
-          // let idNameCharact = 'cbx_'+nameCharact.replace(/[. :?*+^$[\]\\(){}|-]+/g, '_');
 
-          const checkBlock = `
-                    
-                        <div id="cats-block" style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
-                        <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameCharact}</label>
-                        <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameCharact}">
-                        </div>
-                    
-                    `;
-          return checkBlock;
-        }).join('\n');
+        // let checkboxs = chrs.filter(a => {return a.length > 0})
+        // .map((nameCharact, i) => {
+        //     let color = (i % 2 === 0) ? '#f3f3f3': 'white';
+        //     // let idNameCharact = 'cbx_'+nameCharact.replace(/[. :?*+^$[\]\\(){}|-]+/g, '_');
+
+        //     const checkBlock = `
+
+        //         <div id="cats-block" style="display: flex;  margin: 4px 0; flex-flow: row nowrap; justify-content: space-between; background-color: ${color};">
+        //         <label style="font-size: 0.8em; font-weight: bold; padding: 3px 4px;"  for="${idName}${i}">${nameCharact}</label>
+        //         <input style="width: 26px; height: 27px;" type="checkbox" name="${idName}" id="${nameCharact}">
+        //         </div>
+
+        //     `;
+
+        //     return checkBlock;
+        //     }).join('\n');
+
         const sumbitId = v.replace(/[. /:?*+^$[\]\\(){}|-]/g, '_');
         const searchForms = `
                 <h3>${v}</h3>
@@ -465,13 +467,7 @@ class TicketMan {
                             ${checkboxBrands}
                             
                         </fieldset>
-                        <button class="button-find" id="submit-${sumbitId}">Поиск</button>
-                        <fieldset>
-                            <legend> Характеристики: </legend>
-                            ${checkboxs}
-                            
-                        </fieldset>
-
+                        
                     </form>
                     <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                 </div>
@@ -479,6 +475,16 @@ class TicketMan {
         return searchForms;
       }).join('\n')}`);
     }
+    /*
+    
+    <button class="button-find" id="submit-${sumbitId}">Поиск</button>
+                            <fieldset>
+                                <legend> Характеристики: </legend>
+                                ${checkboxs}
+                                
+                            </fieldset>
+    */
+
     $("#set-cats").accordion({
       heightStyle: "content",
       collapsible: true,
@@ -569,7 +575,7 @@ class TicketMan {
         });
         const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
 
-        //$('#tabs').tabs( "option", "active", 10000 );
+        // $('#tabs').tabs( "option", "active", 10000 );
 
         if (result.length > 0) {
           await this.makeProductTickets(result); // array div's
@@ -706,7 +712,7 @@ class TicketMan {
                         </div>
                         <div class='about'>
                             <p class='title'>Цены:</p>
-                            ${htmlPrice}
+                            <div class="ceni">${htmlPrice}</div>
                         </div>
                         <div  class='counter'>
                             <div id='minus_${vid}' class='btn'>-</div>

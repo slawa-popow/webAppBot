@@ -47,8 +47,8 @@ class MysqlClient implements SomeDataBase {
      * @returns Соединение для экзекуций
      */
     async getConnectionPool(): Promise<PoolConnection> {
-        const promiseDbCb = promisify(this.protected!.getConnection).bind(this.protected); // выщемить поключение
-        return await promiseDbCb(); // предать яви подключение
+        const promiseDbCb = promisify(this.protected!.getConnection).bind(this.protected); 
+        return await promiseDbCb(); 
     }
 
     async isRealUser(tableName: string): Promise<boolean> {
@@ -267,6 +267,32 @@ class MysqlClient implements SomeDataBase {
                                 SET count_on_order="${findCountOnOrder + 1}"
                                 WHERE ${addProd.userId}.product_id=${addProd.idProduct}
                             ` );
+                            await promCon(`
+                                UPDATE ${addProd.userId} a 
+                                INNER JOIN (SELECT SUM(count_on_order) as total, category FROM ${addProd.userId} GROUP BY category) b 
+                                ON a.category=b.category
+                                SET count_on_order_cats=b.total
+                                `);
+                            await promCon(`
+                            UPDATE ${addProd.userId} a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM ${addProd.userId} GROUP BY category) b 
+                            ON a.category=b.category
+                            INNER JOIN(
+                            SELECT id, category, 
+                            CASE
+                                WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
+                                WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
+                                WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
+                                WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
+                                WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
+                                WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
+                                WHEN count_on_order_cats >= 150 then price_from_150
+                            end as summa
+                            FROM ${addProd.userId} 
+                            GROUP BY id   
+                            ) d
+                            ON a.id=d.id
+                            SET a.count_on_order_cats=b.total, a.current_price = d.summa
+                            `);
                         }
                 }
                 }
@@ -310,6 +336,33 @@ class MysqlClient implements SomeDataBase {
                                         SET count_on_order="${findCountOnOrder - 1}"
                                         WHERE ${removeProd.userId}.product_id=${removeProd.idProduct}
                                     ` );
+                                await promCon(`
+                                UPDATE ${removeProd.userId} a 
+                                INNER JOIN (SELECT SUM(count_on_order) as total, category FROM ${removeProd.userId} GROUP BY category) b 
+                                ON a.category=b.category
+                                SET count_on_order_cats=b.total
+                                `);
+
+                                await promCon(`
+                                UPDATE ${removeProd.userId} a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM ${removeProd.userId} GROUP BY category) b 
+                                ON a.category=b.category
+                                INNER JOIN(
+                                SELECT id, category, 
+                                CASE
+                                    WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
+                                    WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
+                                    WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
+                                    WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
+                                    WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
+                                    WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
+                                    WHEN count_on_order_cats >= 150 then price_from_150
+                                end as summa
+                                FROM ${removeProd.userId}
+                                GROUP BY id   
+                                ) d
+                                ON a.id=d.id
+                                SET a.count_on_order_cats=b.total, a.current_price = d.summa
+                                `);
                         }
                     }
                 }
@@ -429,4 +482,60 @@ ORDER BY id
 [debug]     'фото': ''
 [debug]   }
 [debug] ]
+---------------------------------------------------------------------
+UPDATE Товары, Лист1 SET Товары.цена_от_1_до_2=Лист1.цена_от_1_до_2, 
+Товары.цена_от_3_до_4=Лист1.цена_от_3_до_4, 
+Товары.цена_от_5_до_9=Лист1.цена_от_5_до_9, 
+Товары.цена_от_10_до_29=Лист1.цена_от_10_до_29, 
+Товары.цена_от_30_до_69=Лист1.цена_от_30_до_69, 
+Товары.цена_от_70_до_149=Лист1.цена_от_70_до_149, 
+Товары.цена_от_150 = Лист1.цена_от_150 
+WHERE Товары.id=Лист1.id
+
+
+cумма строк
+SELECT SUM(count_on_order), category FROM User_1941650155 GROUP BY category
+
+
+UPDATE User_1941650155 a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM User_1941650155 GROUP BY category) b 
+ON a.category=b.category
+SET count_on_order_cats=b.total
+
+
+SELECT category, count_on_order_cats, 
+CASE
+	WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
+    WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
+    WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
+    WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
+    WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
+    WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
+    WHEN count_on_order_cats >= 150 then price_from_150
+end as summa
+FROM User_1941650155 
+GROUP BY category
+------------------------------------------------------------------------------
+
+
+UPDATE User_1941650155 a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM User_1941650155 GROUP BY category) b 
+ON a.category=b.category
+SET a.count_on_order_cats=b.total;
+
+UPDATE User_1941650155 c
+INNER JOIN(
+SELECT id, category, 
+CASE
+	WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
+    WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
+    WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
+    WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
+    WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
+    WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
+    WHEN count_on_order_cats >= 150 then price_from_150
+end as summa
+FROM User_1941650155 
+GROUP BY id   
+) d
+ON c.id=d.id
+SET c.current_price = d.summa
  */
