@@ -110,8 +110,8 @@ export class TicketMan {
                 
                 const userId = this.vapee.userId;
                 const response = await this.vapee.basketMan.removeProduct(userId, id);
-                const calc = await this.hc.getCalculate(this.vapee.userId);
-                this.vapee.basketMan.operatiopWithProdusts(calc);
+                await this.hc.getCalculate(this.vapee.userId);
+                
                 if (Array.isArray(response)) {
                     $('#count-basket').text(`кол-во позиций: ${response.length}`);
                     let total = response.reduce((pv, cv) => {
@@ -134,8 +134,8 @@ export class TicketMan {
             $('.finded-characteristics').css('margin-top', '0');
             
             if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
-                const calc = await this.hc.getCalculate(this.vapee.userId);
-                this.vapee.basketMan.operatiopWithProdusts(calc);
+                await this.hc.getCalculate(this.vapee.userId);
+                
                 await this.viewCars();
                 
             }
