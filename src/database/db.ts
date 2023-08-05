@@ -26,12 +26,18 @@ class Db {
     // добавить в корзину
     async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
         const result = await this.client.addToBasket(addProd);
+       
         return result;
+    }
+
+    async getCalculatePrice(usid: string): Promise<Product[]> {
+        return await this.client.recalcPrice(usid);
     }
 
     // Убрать из корзины
     async removeFromBasket(removeProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
         const result = await this.client.removeFromBasket(removeProd);
+        
         return result;
     }
 

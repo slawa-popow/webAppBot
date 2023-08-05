@@ -15,6 +15,8 @@ export interface SomeDataBase {
     findByCharacts(data: FrontInputData): Promise<Product[]>;
 
     recalcPrice(userId: string): Promise<Product[]>;
+    sumCountOrder(tableName: string): Promise<void>;
+    currentPrice(tableName: string): Promise<void>;
 
     getUuids(): Promise<Product[]>;
     setImageCount(X: string[][]): Promise<boolean>;

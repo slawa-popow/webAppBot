@@ -12,7 +12,8 @@ mainRouter.post('/getUsid', validUsr, mainController.getUserId);
 mainRouter.put('/addProductOnBasket', validUsr, mainController.addToBasket);
 mainRouter.put('/removeProductFromBasket', validUsr, mainController.removeFromBasket);
 mainRouter.post('/getFindByCharacteristics', validUsr, mainController.searchByCharacts);
+mainRouter.post('/getCalculate', validUsr, mainController.getCalculate);
 //
 // mainRouter.get('/Djiugurda', mainController.fromMySklad);
 
-export { mainRouter }; 
+export { mainRouter };  

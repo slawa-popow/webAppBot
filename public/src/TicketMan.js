@@ -92,7 +92,7 @@ export class TicketMan {
                         <p>${prod.category || ''}</p>
                         <p>${prod.brand || ''}</p>
                         <p>${prod.count_on_order || ''}</p>
-                        <p class="paysum">${prod.sum_position}</p>
+                        <p class="paysum">${prod.current_price || 0.0}</p>
                     </div>
                 </div>
                 </div>
@@ -133,6 +133,8 @@ export class TicketMan {
             
             if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
                 await this.viewCars();
+                const calc = await this.hc.getCalculate(this.vapee.userId);
+                console.log('resp ', calc);
             }
         }});
         $('#cnt').on("click", (e) => {
@@ -486,6 +488,7 @@ export class TicketMan {
                         }, 0);
                         $('#total').text(`всего товаров: ${total}`);
                     } else {
+                        console.log(response)
                         this.clearContent(response);
                     } 
                 });
@@ -505,6 +508,7 @@ export class TicketMan {
                         }, 0);
                         $('#total').text(`всего товаров: ${total}`);
                     } else {
+                        console.log(response)
                         this.clearContent(response);
                     }
                 });

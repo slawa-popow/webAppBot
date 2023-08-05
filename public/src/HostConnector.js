@@ -3,6 +3,7 @@ import axios from "axios";
 export class HostConnector {
 
     api = {
+        calculate: 'getCalculate',
         deleteProduct: 'deleteProduct',
         getCats: 'getCategory',
         getUsId: 'getUsid',
@@ -96,6 +97,17 @@ export class HostConnector {
         return null;
     }
 
+    async getCalculate(userId) {
+        try {
+            const url = this.host + this.api.calculate;
+            const response = await axios.post(url, {userId: userId});
+    
+            return response.data;
+        }
+        catch (error) { console.error('Error in HostConnector->getCalculate() ', error); }
+        return null
+        
+    }
 
     /**
      * Запрос на поиск по характеристикам

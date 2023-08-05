@@ -23,7 +23,7 @@ class MainController {
         console.log('id getIndexPage: ', id);
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('indexGF', {layout: 'mainGF'});   
+        return response.status(200).render('index_ccb', {layout: 'main_ccb'});   
     } 
 
 
@@ -41,6 +41,15 @@ class MainController {
     async getAllCategory(_request: Request, response: Response) {
         const allCategory = await db.getAllCategory();
         return response.status(200).json(allCategory);
+    }
+
+    async getCalculate(request: Request, response: Response) {
+        const id = request.body.userId || null;
+        if (id) {
+            const res = await db.getCalculatePrice(id);
+            return response.status(200).json(res);
+        }
+        return response.status(404).json({error: "calculate price: server error"});
     }
 
 

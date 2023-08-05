@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { AllCategory, ErrorInsertInto, Order, Product } from '../types/Product';
 import { promisify } from 'util';
 import { ReqAddToBasket } from "../types/ReqAddToBasket";
-import { OkPacket, RowDataPacketCharacteristic } from "../types/OkPacket";
+import { OkPacket } from "../types/OkPacket";
 import { StatusOrder } from "../types/StatusOrder";
 import { CatsHaracters } from "../types/CatsHaracters";
 import { FrontInputData } from "../types/FrontInputData";
@@ -34,7 +34,7 @@ class MysqlClient implements SomeDataBase {
 
     private initPool(): void {
         this.protected =  mysql.createPool({
-            connectionLimit: 100,
+            connectionLimit: 1000, 
             host: this.HOST,
             user: this.USER,
             password: this.PASSWORD,
@@ -64,6 +64,7 @@ class MysqlClient implements SomeDataBase {
             return false;
         }
         finally {
+            
             connect.release();
         }
         if (result && Array.isArray(result)) {
@@ -88,24 +89,10 @@ class MysqlClient implements SomeDataBase {
     async findByCharacts(data: FrontInputData): Promise<Product[]> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
-        const brands = data.brands;
-        let querySearch: string[] = [];
         let query: string = ''; 
         
-        const nameChars: string = data.characteristics.map((v: string) => {
-            return `характеристики LIKE "%${v}%"`;
-        }).join(' OR ');
-
-        if (data.brands.length > 0 && data.characteristics.length > 0) {
-            for (let b of brands) {
-                querySearch.push(`(бренд LIKE "%${b}%" AND (${nameChars}))`);
-            } 
-            query = querySearch.join(' OR ');
-            
-
-        } else if (data.brands.length === 0 && data.characteristics.length > 0) {
-            query = nameChars;
-        } else if (data.brands.length > 0 && data.characteristics.length === 0) {
+        
+        if (data.brands.length > 0 && data.characteristics.length === 0) {
             query = data.brands.map((v: string) => {
                 return `бренд LIKE "%${v}%"`
             }).join(' OR ');
@@ -152,21 +139,6 @@ class MysqlClient implements SomeDataBase {
             responseCats.categories.push(...rows); // вставим все категории
             // получить все уникальные характеристики по каждой категории
             for (let v of rows) {
-                
-                const charactsQuery = await promCon(`
-                SELECT DISTINCT (характеристики) AS characteristics FROM Товары WHERE характеристики LIKE "%${v}%"; 
-                `) as RowDataPacketCharacteristic[];
-                let setCharactsQuery = new Set();
-                charactsQuery.forEach(v => {
-                    if (v.characteristics) {
-                        let chr = v.characteristics.split('/');
-                        chr.forEach(el => {
-                            if (el.trim().length > 0)
-                                setCharactsQuery.add(el);
-                        });
-                    }
-                });
-
                 const brandsByCatego = await promCon(`
                     SELECT DISTINCT бренд
                     FROM Товары
@@ -176,7 +148,6 @@ class MysqlClient implements SomeDataBase {
                 responseCats.brands[v] = [...brandsByCatego.map(val => {
                     return val['бренд'];
                 })];      
-                responseCats.characteristics[v] = Array.from(setCharactsQuery) as string[];
             } 
               
             return responseCats;
@@ -219,9 +190,10 @@ class MysqlClient implements SomeDataBase {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
         try {
+            await this.sumCountOrder(userId);
+            await this.currentPrice(userId);
             const basket = await promCon(`SELECT * FROM ${userId};`) as Product[];
-            console.log(basket);
-
+            return basket;
         } catch (e) { console.log('Error in MysqlClient->recalcPrice()->catch', e) }
         finally {
             connect.release();
@@ -265,38 +237,13 @@ class MysqlClient implements SomeDataBase {
                             await promCon( `
                                 UPDATE ${addProd.userId} 
                                 SET count_on_order="${findCountOnOrder + 1}"
-                                WHERE ${addProd.userId}.product_id=${addProd.idProduct}
-                            ` );
-                            await promCon(`
-                                UPDATE ${addProd.userId} a 
-                                INNER JOIN (SELECT SUM(count_on_order) as total, category FROM ${addProd.userId} GROUP BY category) b 
-                                ON a.category=b.category
-                                SET count_on_order_cats=b.total
-                                `);
-                            await promCon(`
-                            UPDATE ${addProd.userId} a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM ${addProd.userId} GROUP BY category) b 
-                            ON a.category=b.category
-                            INNER JOIN(
-                            SELECT id, category, 
-                            CASE
-                                WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
-                                WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
-                                WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
-                                WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
-                                WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
-                                WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
-                                WHEN count_on_order_cats >= 150 then price_from_150
-                            end as summa
-                            FROM ${addProd.userId} 
-                            GROUP BY id   
-                            ) d
-                            ON a.id=d.id
-                            SET a.count_on_order_cats=b.total, a.current_price = d.summa
+                                WHERE ${addProd.userId}.product_id=${addProd.idProduct};
                             `);
+                            
                         }
                 }
                 }
-
+                
                 const basket = await promCon(`SELECT * FROM ${addProd.userId};`) as Product[];
                 return basket;
             }
@@ -309,6 +256,54 @@ class MysqlClient implements SomeDataBase {
         return {error: ['err-корзина(+)']};
     }
 
+
+    async sumCountOrder(tableName: string): Promise<void> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+
+        try {
+            await promCon(`
+                    UPDATE ${tableName} a 
+                    INNER JOIN (SELECT SUM(count_on_order) as total, category FROM ${tableName} GROUP BY category) b 
+                    ON a.category=b.category
+                    SET count_on_order_cats=b.total;
+                `); 
+                connect.commit();
+                connect.release();
+        } catch (e) { console.log('Error in MysqlClient->sumCountOrder()->catch', e) }
+    }
+
+
+    
+
+    async currentPrice(tableName: string): Promise<void> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+
+        try {
+            await promCon(`
+            UPDATE ${tableName} a
+            INNER JOIN(
+                SELECT id, category, 
+                CASE
+                    WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
+                    WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
+                    WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
+                    WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
+                    WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
+                    WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
+                    WHEN count_on_order_cats >= 150 then price_from_150
+                end as summa
+                FROM ${tableName} 
+                GROUP BY id   
+                ) d
+            ON a.id=d.id
+            SET a.current_price = d.summa;
+            `);
+            connect.commit();
+            connect.release();
+        } catch (e) { console.log('Error in MysqlClient->currentPrice()->catch', e) }
+    }
 
     /**
      * Убрать товар из корзины по айди
@@ -334,35 +329,9 @@ class MysqlClient implements SomeDataBase {
                                 await promCon( `
                                         UPDATE ${removeProd.userId} 
                                         SET count_on_order="${findCountOnOrder - 1}"
-                                        WHERE ${removeProd.userId}.product_id=${removeProd.idProduct}
-                                    ` );
-                                await promCon(`
-                                UPDATE ${removeProd.userId} a 
-                                INNER JOIN (SELECT SUM(count_on_order) as total, category FROM ${removeProd.userId} GROUP BY category) b 
-                                ON a.category=b.category
-                                SET count_on_order_cats=b.total
-                                `);
-
-                                await promCon(`
-                                UPDATE ${removeProd.userId} a INNER JOIN (SELECT  SUM(count_on_order) as total, category FROM ${removeProd.userId} GROUP BY category) b 
-                                ON a.category=b.category
-                                INNER JOIN(
-                                SELECT id, category, 
-                                CASE
-                                    WHEN count_on_order_cats BETWEEN 1 AND 2 then price_from_1to2
-                                    WHEN count_on_order_cats BETWEEN 3 AND 4 then price_from_3to4
-                                    WHEN count_on_order_cats BETWEEN 5 AND 9 then price_from_5to9
-                                    WHEN count_on_order_cats BETWEEN 10 AND 29 then price_from_10to29
-                                    WHEN count_on_order_cats BETWEEN 30 AND 69 then price_from_30to69
-                                    WHEN count_on_order_cats BETWEEN 70 AND 149 then price_from_70to149
-                                    WHEN count_on_order_cats >= 150 then price_from_150
-                                end as summa
-                                FROM ${removeProd.userId}
-                                GROUP BY id   
-                                ) d
-                                ON a.id=d.id
-                                SET a.count_on_order_cats=b.total, a.current_price = d.summa
-                                `);
+                                        WHERE ${removeProd.userId}.product_id=${removeProd.idProduct};
+                                        `);
+                
                         }
                     }
                 }

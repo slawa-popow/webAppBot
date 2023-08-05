@@ -116,6 +116,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class HostConnector {
   api = {
+    calculate: 'getCalculate',
     deleteProduct: 'deleteProduct',
     getCats: 'getCategory',
     getUsId: 'getUsid',
@@ -202,6 +203,18 @@ class HostConnector {
       return response.data;
     } catch (error) {
       console.error('Error in HostConnector->getTenProducts() ', error);
+    }
+    return null;
+  }
+  async getCalculate(userId) {
+    try {
+      const url = this.host + this.api.calculate;
+      const response = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+        userId: userId
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error in HostConnector->getCalculate() ', error);
     }
     return null;
   }
@@ -371,7 +384,7 @@ class TicketMan {
                         <p>${prod.category || ''}</p>
                         <p>${prod.brand || ''}</p>
                         <p>${prod.count_on_order || ''}</p>
-                        <p class="paysum">${prod.sum_position}</p>
+                        <p class="paysum">${prod.current_price || 0.0}</p>
                     </div>
                 </div>
                 </div>
@@ -407,6 +420,8 @@ class TicketMan {
         $('.finded-characteristics').css('margin-top', '0');
         if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
           await this.viewCars();
+          const calc = await this.hc.getCalculate(this.vapee.userId);
+          console.log('resp ', calc);
         }
       }
     });
@@ -747,6 +762,7 @@ class TicketMan {
             }, 0);
             $('#total').text(`всего товаров: ${total}`);
           } else {
+            console.log(response);
             this.clearContent(response);
           }
         });
@@ -763,6 +779,7 @@ class TicketMan {
             }, 0);
             $('#total').text(`всего товаров: ${total}`);
           } else {
+            console.log(response);
             this.clearContent(response);
           }
         });
