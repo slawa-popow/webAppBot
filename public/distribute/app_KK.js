@@ -38112,7 +38112,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const prodURL = 'https://web-app-bot-b.vercel.app/';
 const devURL = '/';
-const URL = devURL;
+const URL = prodURL;
 const hostConnector = new _src_HostConnector__WEBPACK_IMPORTED_MODULE_6__.HostConnector(URL);
 const finderMan = new _src_FinderMan__WEBPACK_IMPORTED_MODULE_5__.FinderMan(hostConnector);
 const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderMan);
