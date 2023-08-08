@@ -557,6 +557,7 @@ class TicketMan {
                 <h3>${v}</h3>
                 <div>
                 <p>Выбери критерии поиска:</p>
+                <input type="text" id="search-text-${sumbitId}">
                 <button class="button-find" id="submit-${sumbitId}">Поиск</button>
                     <form name=form-${sumbitId}>
                         <fieldset>
@@ -566,7 +567,7 @@ class TicketMan {
                         </fieldset>
                         
                     </form>
-                    <button class="button-find" id="submit-${sumbitId}">Поиск</button>
+                    
                 </div>
                 `;
         return searchForms;
@@ -734,22 +735,14 @@ class TicketMan {
         // action_on_click_button
         const idform = 'form-' + id;
         const elemsForm = document.forms[idform].elements[id];
-
-        // const inputField = document.getElementById(`setText-${id}`);
-        // const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
-        // (validText) ? this.forRequest.searchText = inputField.value : inputField.value = 'Не валидный текст';
-        // $('#select-cats').text(`Выбрано характеристик: ${forRequest.characteristics.length}`)
-        // $('#list-cats').text(forRequest.characteristics.join(' & '));
-
+        this.forRequest.searchText = '';
+        const inputField = document.getElementById(`search-text-${id}`);
+        const validText = /^[0-9a-zа-яё :]+$/i.test(inputField.value);
+        const searchText = validText ? inputField.value : '';
         $('#cnt').remove();
         $('#content').append('<div class="Cart-Container" id="cnt"> </div>');
         this.msg('загрузка...', this.forRequest.category);
-        this.forRequest.characteristics = this.forRequest.characteristics.filter(val => {
-          return val && val.length > 0;
-        });
-        this.forRequest.brands = this.forRequest.brands.filter(val => {
-          return val && val.length > 0;
-        });
+        this.forRequest.searchText = searchText;
         const result = await this.vapee.stockMan.findByCharacteristics(this.forRequest);
         $('#tabs').tabs("option", "active", 10000);
         if (result.length > 0) {

@@ -23,7 +23,7 @@ class MainController {
         
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('index_HI', {layout: 'main_HI'});   
+        return response.status(200).render('index_GHI', {layout: 'main_GHI'});   
     } 
 
 
@@ -97,6 +97,7 @@ class MainController {
 
     async searchByCharacts(request: Request, response: Response) {
         const data: FrontInputData = request.body;
+        
         const result = await db.findByCharacts(data);
         response.status(200).json(result)
     }

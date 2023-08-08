@@ -92,11 +92,15 @@ class MysqlClient implements SomeDataBase {
         let query: string = ''; 
         
         
-        if (data.brands.length > 0 && data.characteristics.length === 0) {
+        if (data.brands.length > 0 && data.searchText.trim().length === 0) {
             query = data.brands.map((v: string) => {
                 return `бренд LIKE "%${v}%"`
             }).join(' OR ');
             
+        } else {
+            query = data.searchText.split(' ').map((v) => {
+                return `характеристики LIKE "%${v}%"`
+            }).join(' OR ');
         }
         
         try {
