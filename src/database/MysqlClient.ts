@@ -162,6 +162,23 @@ class MysqlClient implements SomeDataBase {
     }
 
 
+    async deleteProduct(userId: string, idProduct: string): Promise<Product[]> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+        try {
+            await promCon(`DELETE FROM ${userId} WHERE product_id=${idProduct};`) as Product[];
+            const result = await this.getBasketInfo(userId);
+            return result;
+
+        } catch (e) { console.log('Error in MysqlClient->deleteProduct()->catch', e) }
+        finally {
+            connect.release();
+        }
+        return [];
+
+    }
+
+
     /**
      * Вернуть корзину с данными клиента
      * @param usid id telegram user
@@ -203,50 +220,64 @@ class MysqlClient implements SomeDataBase {
 
     /**
      * Добавить товар в корзину по айди
-     * @param addProd данные об товаре из фронта
+     * @param addProd данные об товаре из фронта 
      * @returns 
      */
-    async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
+    async addToBasket(userId: string, addProds: {[key: string]: number}): Promise<Product[] | ErrorInsertInto> {
         const connect = await this.getConnectionPool();
         const promCon = promisify(connect.query).bind(connect);
         try {
-            const result = await promCon(`SELECT * FROM ${this.table.allprods} WHERE id=${addProd.idProduct};`) as Product[];
-            if (Array.isArray(result) && result.length > 0) {
-                const p: Product = result[0];
-                const usid = addProd.userId.split('_')[1];
-                                
-                if ( p['количество_на_складе'] && +p['количество_на_складе'] > 0) {
-                    const findProductWithId = await promCon(`
-                        SELECT count_on_order FROM ${addProd.userId} WHERE product_id=${addProd.idProduct};
-                    `) as Order[];
-
-                    if (Array.isArray(findProductWithId) && findProductWithId.length === 0) {
-                            await promCon(`
-                            INSERT INTO ${addProd.userId} (user_id, product_id, photo, uniq_token, datetime, category, brand,
-                                name_good, characteristic, count_on_stock, count_on_order, price_from_1to2, price_from_3to4, price_from_5to9,
-                                price_from_10to29, price_from_30to69, price_from_70to149, price_from_150, order_status)
-                            VALUES ("${usid}", "${addProd.idProduct}", "${p['фото']}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
-                                "${p["характеристики"].replace(/"/g, '')}", "${p["количество_на_складе"] || 0}", "1",  "${p["цена_от_1_до_2"] || 0}", "${p["цена_от_3_до_4"] || 0}",
-                                ${p["цена_от_5_до_9"] || 0}, ${p["цена_от_10_до_29"] || 0}, ${p["цена_от_30_до_69"] || 0}, ${p["цена_от_70_до_149"] || 0},
-                                "${p["цена_от_150"] || 0}", "${StatusOrder.IN_BASKET}");
-                            `) as OkPacket;
-                    }
-                    else {
-                        const findCountOnOrder = +findProductWithId[0].count_on_order;
-                        if (p['количество_на_складе'] && findCountOnOrder < +p['количество_на_складе']) {
-                            await promCon( `
-                                UPDATE ${addProd.userId} 
-                                SET count_on_order="${findCountOnOrder + 1}"
-                                WHERE ${addProd.userId}.product_id=${addProd.idProduct};
-                            `);
-                            
-                        }
-                }
-                }
+            
+            for (let prd of Object.keys(addProds)) {
+                const result = await promCon(`SELECT * FROM ${this.table.allprods} WHERE id=${prd};`) as Product[];
                 
-                const basket = await promCon(`SELECT * FROM ${addProd.userId};`) as Product[];
-                return basket;
+                if (Array.isArray(result) && result.length > 0) {
+                    const p: Product = result[0];
+                    const usid = userId.split('_')[1];
+                                    
+                    if ( p['количество_на_складе'] && +p['количество_на_складе'] > 0) {
+                        let findProductWithId;
+                        try {
+                            findProductWithId  = await promCon(`
+                                SELECT count_on_order FROM ${userId} WHERE product_id=${prd};
+                            `) as Order[];
+                        } catch (e) {} 
+                        
+                        if (Array.isArray(findProductWithId) && findProductWithId.length === 0) {
+                            let cnt_on_order = 1;
+                            if (p['количество_на_складе'] && +addProds[prd] <= +p['количество_на_складе']) {
+                                cnt_on_order = addProds[prd];
+                            }
+                                await promCon(`
+                                INSERT INTO ${userId} (user_id, product_id, photo, uniq_token, datetime, category, brand,
+                                    name_good, characteristic, count_on_stock, count_on_order, price_from_1to2, price_from_3to4, price_from_5to9,
+                                    price_from_10to29, price_from_30to69, price_from_70to149, price_from_150, order_status)
+                                VALUES ("${usid}", "${prd}", "${p['фото']}", "", "${new Date().toISOString()}", "${p["группы"].replace(/"/g, '')}", "${p["бренд"].replace(/"/g, '')}", "${p["наименование"].replace(/"/g, '')}",
+                                    "${p["характеристики"].replace(/"/g, '')}", "${p["количество_на_складе"] || 0}", "${cnt_on_order}",  "${p["цена_от_1_до_2"] || 0}", "${p["цена_от_3_до_4"] || 0}",
+                                    ${p["цена_от_5_до_9"] || 0}, ${p["цена_от_10_до_29"] || 0}, ${p["цена_от_30_до_69"] || 0}, ${p["цена_от_70_до_149"] || 0},
+                                    "${p["цена_от_150"] || 0}", "${StatusOrder.IN_BASKET}");
+                                `) as OkPacket;
+                        }
+                        else {
+                            if (Array.isArray(findProductWithId) && findProductWithId[0]) {
+                                 
+                                if (p['количество_на_складе'] && addProds[prd] <= +p['количество_на_складе']) {
+                                    await promCon( `
+                                        UPDATE ${userId} 
+                                        SET count_on_order="${addProds[prd]}"
+                                        WHERE ${userId}.product_id=${prd};
+                                    `);
+                                    
+                                }
+
+                            }
+                    }
+                    }
+                    
+                }
             }
+            const basket = await this.recalcPrice(userId);
+            return basket;
 
         } catch (e) { console.log('Error in MysqlClient->addToBasket()->catch', e) } 
         finally {

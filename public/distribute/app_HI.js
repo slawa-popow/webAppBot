@@ -17,6 +17,8 @@ class BasketMan {
     this.hc = hostConnector;
     this.vapee = null;
     this.userBasket = [];
+    this.userCart = {};
+    this.usid = null;
   }
   operatiopWithProdusts(result) {
     if (Array.isArray(result)) {
@@ -24,15 +26,42 @@ class BasketMan {
       this.userBasket.push(...result);
       return this.userBasket;
     }
-    return result;
+    return this.userBasket;
   }
   async removeProduct(userId, id) {
-    const result = await this.hc.removeProduct(userId, id);
-    return this.operatiopWithProdusts(result);
+    this.usid = userId;
+    if (this.userCart) {
+      if (!this.userCart.hasOwnProperty(id)) {
+        this.userCart[id] = 1;
+      } else {
+        if (+this.userCart[id] - 1 === 0) {
+          delete this.userCart[id];
+        } else {
+          this.userCart[id] = +this.userCart[id] - 1;
+        }
+      }
+    }
   }
   async addProduct(userId, id) {
-    const result = await this.hc.addProduct(userId, id);
+    this.usid = userId;
+    if (this.userCart) {
+      if (!this.userCart.hasOwnProperty(id)) {
+        this.userCart[id] = 1;
+      } else {
+        this.userCart[id] = +this.userCart[id] + 1;
+      }
+    }
+  }
+  async fillBasket() {
+    const result = await this.hc.fillBasket(this.usid, this.userCart);
     return this.operatiopWithProdusts(result);
+  }
+  async getBasket(userId) {
+    const result = await this.hc.getBasket(userId);
+    return result;
+  }
+  async delProduct(userId, idProduct) {
+    return await this.hc.delProd(userId, idProduct);
   }
 }
 
@@ -116,6 +145,8 @@ __webpack_require__.r(__webpack_exports__);
 
 class HostConnector {
   api = {
+    getUserBasket: 'getUsrBasket',
+    fill: 'fillUserBasket',
     calculate: 'getCalculate',
     deleteProduct: 'deleteProduct',
     getCats: 'getCategory',
@@ -130,6 +161,18 @@ class HostConnector {
   };
   constructor(url) {
     this.host = url;
+  }
+  async getBasket(usid) {
+    try {
+      const url = this.host + this.api.getUserBasket;
+      const response = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+        userId: usid
+      });
+      return response.data || [];
+    } catch (error) {
+      console.error('Error in FinderMan->getBasket()', error);
+    }
+    return null;
   }
 
   /**
@@ -160,6 +203,19 @@ class HostConnector {
     }
     return null;
   }
+  async fillBasket(usid, prods) {
+    try {
+      const url = this.host + this.api.fill;
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].put(url, {
+        userId: usid,
+        idProducts: prods
+      });
+      return resp.data;
+    } catch (e) {
+      console.log('Error in HostConnector->fillBasket() ', e);
+      return e.response.data;
+    }
+  }
 
   /**
    * Добавить товар в корзину.
@@ -176,6 +232,19 @@ class HostConnector {
     } catch (e) {
       console.log('Error in HostConnector->addProduct() ', e);
       return e.response.data;
+    }
+  }
+  async delProd(usid, id) {
+    try {
+      const url = this.host + this.api.deleteProduct;
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+        userId: usid,
+        idProduct: id
+      });
+      return resp.data;
+    } catch (e) {
+      console.log('Error in HostConnector->delProd() ', e);
+      return [];
     }
   }
   async removeProduct(userId, id) {
@@ -300,6 +369,7 @@ __webpack_require__.r(__webpack_exports__);
 /* provided dependency */ var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 class TicketMan {
   constructor(hostConnector) {
+    this.xxx = 1;
     this.hc = hostConnector;
     this.vapee = null;
     this.bucket = null; // Временное хранилище для выборок 
@@ -362,11 +432,12 @@ class TicketMan {
    * heightStyle: "fill"
    */
 
-  async viewCars() {
+  async viewCars(basket) {
     $(`#finded-characteristics`).empty();
     $('#in-basket').empty();
     $('#in-basket').css('overflow-y', 'scroll');
-    for (let prod of this.vapee.basketMan.userBasket) {
+    let totalPrice = [];
+    for (let prod of basket) {
       const cartProd = `
                 <div class="prd">
                 <div id="cartProd" class="cartProd">
@@ -393,13 +464,14 @@ class TicketMan {
                 </div>
             </div>  
             `;
+      totalPrice.push(+prod.count_on_order * +prod.current_price);
       $('#in-basket').append(cartProd);
       $(`#button-remove-product-from-cart-${prod.product_id}`).on('click', async e => {
         let rawid = e.target.id.split('-').reverse();
         let id = rawid[0];
         const userId = this.vapee.userId;
-        const response = await this.vapee.basketMan.removeProduct(userId, id);
-        await this.hc.getCalculate(this.vapee.userId);
+        const response = await this.vapee.basketMan.delProduct(userId, id);
+        if (this.vapee.basketMan.userCart.hasOwnProperty(id)) delete this.vapee.basketMan.userCart[id];
         if (Array.isArray(response)) {
           $('#count-basket').text(`кол-во позиций: ${response.length}`);
           let total = response.reduce((pv, cv) => {
@@ -407,11 +479,21 @@ class TicketMan {
           }, 0);
           $('#total').text(`всего товаров: ${total}`);
           $('#in-basket').empty();
-          this.viewCars();
+          if (response.length > 0) {
+            $(`#total-summa`).text(`${response.reduce((pv, cv) => {
+              return pv + +cv.count_on_order * +cv.current_price;
+            })} руб.`);
+          } else {
+            $(`#total-summa`).text('0 руб.');
+          }
+          this.viewCars(response);
         } else {
           this.clearContent(response);
         }
       });
+      $(`#total-summa`).text(`${totalPrice.reduce((pv, cv) => {
+        return pv + cv;
+      })} руб.`);
     }
   }
   async makeTab() {
@@ -420,8 +502,8 @@ class TicketMan {
       activate: async (e, ui) => {
         $('.finded-characteristics').css('margin-top', '0');
         if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
-          await this.hc.getCalculate(this.vapee.userId);
-          await this.viewCars();
+          const basket = await this.vapee.basketMan.getBasket(this.vapee.userId);
+          await this.viewCars(basket);
         }
       }
     });
@@ -429,7 +511,7 @@ class TicketMan {
       $('#tabs').tabs("option", "active", 10);
     });
     $(function () {
-      $("input").checkboxradio();
+      $('input[type="checkbox"]').checkboxradio();
     });
     const result = await this.hc.getCategory();
     const cats = result.categories;
@@ -730,9 +812,14 @@ class TicketMan {
                             <div class="ceni">${htmlPrice}</div>
                         </div>
                         <div  class='counter'>
-                            <div id='minus_${vid}' class='btn'>-</div>
-                            <div id='count_${vid}' class='count'>0</div>
-                            <div id=plus_${vid} class='btn btn-plus'>+</div>
+                            <div class="counter-verb">
+                                <div id='minus_${vid}' class='btn'>-</div>
+                                <div id='count_${vid}' class='count'><input type="text" value="0" id="input-${vid}" /></div>
+                                <div id=plus_${vid} class='btn btn-plus'>+</div>
+                            </div>
+                            
+                                <button class="submit-product" id="submit-product-${vid}">добавить</button>
+                            
                         </div>
                         <div class='about'>
                             <p class='title'>${v['наименование'] || ''}</p>
@@ -749,39 +836,47 @@ class TicketMan {
         $('#tabs').tabs("option", "active", 10);
       });
       (async (id, onStock) => {
-        $(`#plus_${id}`).on("click", async e => {
-          let currCnt = $(`#count_${id}`).text();
-          currCnt = +currCnt >= 0 && +currCnt < onStock ? +currCnt + 1 : currCnt;
-          $(`#count_${id}`).text('' + currCnt);
-          const userId = this.vapee.userId;
-          const response = await this.vapee.basketMan.addProduct(userId, id);
-          if (Array.isArray(response)) {
-            $('#count-basket').text(`кол-во позиций: ${response.length}`);
-            let total = response.reduce((pv, cv) => {
-              return pv + +cv.count_on_order;
-            }, 0);
-            $('#total').text(`всего товаров: ${total}`);
+        $(`#submit-product-${id}`).on("click", async e => {
+          const inputValue = $(`#input-${id}`).val();
+          let result = null;
+          if (/^\d+$/.test(inputValue)) {
+            if (+inputValue > 0 && +inputValue <= onStock) {
+              this.vapee.basketMan.userCart[id] = +inputValue;
+            } else {
+              this.vapee.basketMan.userCart[id] = +onStock;
+            }
+            result = await this.vapee.basketMan.fillBasket();
+            if (Array.isArray(result)) {
+              $('#count-basket').text(`кол-во позиций: ${result.length}`);
+              let total = result.reduce((pv, cv) => {
+                return pv + +cv.count_on_order;
+              }, 0);
+              $('#total').text(`всего товаров: ${total}`);
+            } else {
+              console.log(response);
+              this.clearContent(response);
+            }
           } else {
-            console.log(response);
-            this.clearContent(response);
+            $(`#input-${id}`).val('0');
           }
         });
-        $(`#minus_${id}`).on("click", async e => {
-          let currCnt = $(`#count_${id}`).text();
-          currCnt = +currCnt > 0 ? +currCnt - 1 : currCnt;
-          $(`#count_${id}`).text('' + currCnt);
+        $(`#plus_${id}`).on("click", async e => {
+          let currCnt = $(`#input-${id}`).val();
           const userId = this.vapee.userId;
-          const response = await this.vapee.basketMan.removeProduct(userId, id);
-          if (Array.isArray(response)) {
-            $('#count-basket').text(`кол-во позиций: ${response.length}`);
-            let total = response.reduce((pv, cv) => {
-              return pv + +cv.count_on_order;
-            }, 0);
-            $('#total').text(`всего товаров: ${total}`);
-          } else {
-            console.log(response);
-            this.clearContent(response);
+          if (+currCnt >= 0 && +currCnt < onStock) {
+            currCnt = +currCnt + 1;
+            await this.vapee.basketMan.addProduct(userId, id);
           }
+          $(`#input-${id}`).val('' + currCnt);
+        });
+        $(`#minus_${id}`).on("click", async e => {
+          let currCnt = $(`#input-${id}`).val();
+          const userId = this.vapee.userId;
+          if (+currCnt > 0) {
+            currCnt = +currCnt - 1;
+            await this.vapee.basketMan.removeProduct(userId, id);
+          }
+          $(`#input-${id}`).val('' + currCnt);
         });
       })(vid, count_on_stock);
     }
@@ -864,6 +959,7 @@ class Vapee {
     const userId = await this.getUsId();
     if (userId) {
       this.userId = userId;
+      this.basketMan.usid = this.userId;
       const tenProd = await this.stockMan.getTenProducts();
       this.ticketMan.setData(tenProd);
       await this.ticketMan.viewStartProducts();

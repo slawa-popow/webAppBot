@@ -4,6 +4,7 @@
 export class TicketMan {
 
     constructor(hostConnector) {
+        this.xxx = 1;
         this.hc = hostConnector;
         this.vapee = null;
         this.bucket = null;   // Временное хранилище для выборок 
@@ -69,13 +70,16 @@ export class TicketMan {
      * heightStyle: "fill"
      */
 
-    async viewCars() {
+    async viewCars(basket) {
+       
         $(`#finded-characteristics`).empty();
         $('#in-basket').empty();
 
         $('#in-basket').css('overflow-y', 'scroll');
+
+        let totalPrice = [];
         
-        for (let prod of this.vapee.basketMan.userBasket) {
+        for (let prod of basket) {
             const cartProd = `
                 <div class="prd">
                 <div id="cartProd" class="cartProd">
@@ -102,15 +106,16 @@ export class TicketMan {
                 </div>
             </div>  
             `;
-
+            totalPrice.push(+prod.count_on_order * (+prod.current_price));
             $('#in-basket').append(cartProd);
             $(`#button-remove-product-from-cart-${prod.product_id}`).on('click', async (e) => {
                 let rawid = e.target.id.split('-').reverse();
                 let id = rawid[0];
                 
                 const userId = this.vapee.userId;
-                const response = await this.vapee.basketMan.removeProduct(userId, id);
-                await this.hc.getCalculate(this.vapee.userId);
+                const response = await this.vapee.basketMan.delProduct(userId, id);
+                if (this.vapee.basketMan.userCart.hasOwnProperty(id))
+                    delete this.vapee.basketMan.userCart[id];
                 
                 if (Array.isArray(response)) {
                     $('#count-basket').text(`кол-во позиций: ${response.length}`);
@@ -119,12 +124,18 @@ export class TicketMan {
                     }, 0);
                     $('#total').text(`всего товаров: ${total}`);
                     $('#in-basket').empty();
-                   
-                    this.viewCars();
+                    if (response.length > 0) {
+                        $(`#total-summa`).text(`${response.reduce((pv, cv) => {return pv + (+cv.count_on_order * (+cv.current_price))})} руб.`);
+                    } else {
+                        $(`#total-summa`).text('0 руб.');
+                    }
+                    this.viewCars(response);
                 } else {
                     this.clearContent(response);
                 }
             });
+
+            $(`#total-summa`).text(`${totalPrice.reduce((pv, cv) => {return pv + cv})} руб.`)
         }
     }
 
@@ -134,17 +145,15 @@ export class TicketMan {
             $('.finded-characteristics').css('margin-top', '0');
             
             if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
-                await this.hc.getCalculate(this.vapee.userId);
-                
-                await this.viewCars();
-                
+                const basket = await this.vapee.basketMan.getBasket(this.vapee.userId);
+                await this.viewCars(basket); 
             }
         }});
         $('#cnt').on("click", (e) => {
             $('#tabs').tabs( "option", "active", 10 );
         });
         $( function() {
-            $( "input" ).checkboxradio();
+            $( 'input[type="checkbox"]' ).checkboxradio();
         });
 
         const result = await this.hc.getCategory();
@@ -456,9 +465,14 @@ export class TicketMan {
                             <div class="ceni">${htmlPrice}</div>
                         </div>
                         <div  class='counter'>
-                            <div id='minus_${vid}' class='btn'>-</div>
-                            <div id='count_${vid}' class='count'>0</div>
-                            <div id=plus_${vid} class='btn btn-plus'>+</div>
+                            <div class="counter-verb">
+                                <div id='minus_${vid}' class='btn'>-</div>
+                                <div id='count_${vid}' class='count'><input type="text" value="0" id="input-${vid}" /></div>
+                                <div id=plus_${vid} class='btn btn-plus'>+</div>
+                            </div>
+                            
+                                <button class="submit-product" id="submit-product-${vid}">добавить</button>
+                            
                         </div>
                         <div class='about'>
                             <p class='title'>${v['наименование'] || ''}</p>
@@ -476,44 +490,58 @@ export class TicketMan {
                 $('#tabs').tabs( "option", "active", 10 );
             });
             (async (id, onStock)=>{
+
+                $(`#submit-product-${id}`).on("click", async (e) => {
+                    const inputValue = $(`#input-${id}`).val();
+                    
+                    let result = null;
+                    if (/^\d+$/.test(inputValue)) {
+                        if ((+inputValue > 0) && (+inputValue <= onStock)) {
+                            this.vapee.basketMan.userCart[id] = +inputValue;
+                        } else {
+                            this.vapee.basketMan.userCart[id] = +onStock;
+                        }
+                        
+                        result = await this.vapee.basketMan.fillBasket();
+                                 
+                        if (Array.isArray(result)) {
+                            $('#count-basket').text(`кол-во позиций: ${result.length}`);
+                            let total = result.reduce((pv, cv) => {
+                                return pv + (+cv.count_on_order);
+                            }, 0);
+                            $('#total').text(`всего товаров: ${total}`);
+                        } else {
+                            console.log(response)
+                            this.clearContent(response);
+                        }
+
+                } else {
+                    $(`#input-${id}`).val('0');
+                }
+                });
                 
                 $( `#plus_${id}` ).on( "click", async (e) => {
-                    let currCnt = $(`#count_${id}`).text();
-                    currCnt = ((+currCnt >= 0) && (+currCnt < onStock)) ? (+currCnt) + 1 : currCnt;
-                    $(`#count_${id}`).text(''+currCnt);
+                    let currCnt = $(`#input-${id}`).val();
                     const userId = this.vapee.userId;
-                    const response = await this.vapee.basketMan.addProduct(userId, id);
-                    
-                    if (Array.isArray(response)) {
-                        $('#count-basket').text(`кол-во позиций: ${response.length}`);
-                        let total = response.reduce((pv, cv) => {
-                            return pv + (+cv.count_on_order);
-                        }, 0);
-                        $('#total').text(`всего товаров: ${total}`);
-                    } else {
-                        console.log(response)
-                        this.clearContent(response);
+                    if ((+currCnt >= 0) && (+currCnt < onStock)) {
+                        currCnt = (+currCnt) + 1;
+                        await this.vapee.basketMan.addProduct(userId, id);
                     } 
+                    $(`#input-${id}`).val(''+currCnt);
+                    
                 });
 
 
                 $( `#minus_${id}` ).on( "click", async (e) => {
-                    let currCnt = $(`#count_${id}`).text();
-                    currCnt = (+currCnt > 0) ? (+currCnt) - 1 : currCnt;
-                    $(`#count_${id}`).text(''+currCnt);
+                    let currCnt = $(`#input-${id}`).val();
                     const userId = this.vapee.userId;
-                    const response = await this.vapee.basketMan.removeProduct(userId, id);
-
-                    if (Array.isArray(response)) {
-                        $('#count-basket').text(`кол-во позиций: ${response.length}`);
-                        let total = response.reduce((pv, cv) => {
-                            return pv + (+cv.count_on_order);
-                        }, 0);
-                        $('#total').text(`всего товаров: ${total}`);
-                    } else {
-                        console.log(response)
-                        this.clearContent(response);
-                    }
+                    if (+currCnt > 0) {
+                        currCnt = (+currCnt) - 1;
+                        await this.vapee.basketMan.removeProduct(userId, id);
+                    } 
+                    $(`#input-${id}`).val(''+currCnt);
+                    
+                    
                 });
                 
                 

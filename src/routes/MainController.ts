@@ -20,16 +20,16 @@ class MainController {
         const requery = request.query;
         
         const id = requery.usid;
-        console.log('id getIndexPage: ', id);
+        
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('index_KK', {layout: 'main_KK'});   
+        return response.status(200).render('index_HI', {layout: 'main_HI'});   
     } 
 
 
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
-        console.log('id sesion: ', id);
+        
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
@@ -53,13 +53,25 @@ class MainController {
     }
 
 
-    async addToBasket(request: Request, response: Response) { 
-        const addProd: ReqAddToBasket = request.body;
-        if (addProd.userId && addProd.idProduct) {
-            const result = await db.addToBasket(addProd); 
+    // async addToBasket(request: Request, response: Response) { 
+    //     const addProd: ReqAddToBasket = request.body;
+    //     if (addProd.userId && addProd.idProduct) {
+    //         const result = await db.addToBasket(addProd); 
+    //         return response.status(200).json(result);
+    //     }
+    //     return response.status(404).json({error: "add product: server error"}); 
+    // }
+
+
+    async fillUserBasket(request: Request, response: Response) {
+        const userData = request.body;
+        
+        if (userData && userData.userId && userData.idProducts) {
+            const result = await db.addToBasket(userData.userId, userData.idProducts);
+            
             return response.status(200).json(result);
         }
-        return response.status(404).json({error: "add product: server error"}); 
+        return response.status(404).json({error: "add product: server error"});
     }
 
 
@@ -72,11 +84,31 @@ class MainController {
         return response.status(404).json({error: "remove product: server error"});
     }
 
+    async delProduct(request: Request, response: Response) {
+        console.log(request.body); 
+        const prodInfo = request.body;
+        if (prodInfo.userId && prodInfo.idProduct) {
+            const result = await db.delProduct(prodInfo.userId, prodInfo.idProduct);
+            return response.status(200).json(result);
+        }
+        return response.status(404).json({error: "delete product: server error"});
+    }
+
 
     async searchByCharacts(request: Request, response: Response) {
         const data: FrontInputData = request.body;
         const result = await db.findByCharacts(data);
         response.status(200).json(result)
+    }
+
+    async getUsrBasket(request: Request, response: Response) {
+        const id = request.body.userId;
+        if (id) {
+            const result = await db.getBasketInfo(id);
+            
+            return response.status(200).json(result);
+        }
+        return response.status(404).json({error: "getBasket: server error"});
     }
 
 

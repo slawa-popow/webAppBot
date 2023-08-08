@@ -3,6 +3,8 @@ import axios from "axios";
 export class HostConnector {
 
     api = {
+        getUserBasket: 'getUsrBasket',
+        fill: 'fillUserBasket',
         calculate: 'getCalculate',
         deleteProduct: 'deleteProduct',
         getCats: 'getCategory',
@@ -20,6 +22,16 @@ export class HostConnector {
         this.host = url;
     }
 
+
+    async getBasket(usid) {
+        try {
+            const url =  this.host + this.api.getUserBasket;
+            const response = await axios.post(url, {userId: usid})
+            return response.data || [];
+
+        } catch (error) { console.error('Error in FinderMan->getBasket()', error); } 
+        return null;
+    }
 
     /**
      * Получить айди (корзину) юзера
@@ -52,6 +64,17 @@ export class HostConnector {
         return null;
     }
 
+    async fillBasket(usid, prods) {
+        try {
+            const url = this.host + this.api.fill;
+            const resp = await axios.put(url, {userId: usid, idProducts: prods});
+            return resp.data;
+ 
+        } catch (e) { 
+            console.log('Error in HostConnector->fillBasket() ', e); 
+            return(e.response.data);
+        }
+    }
 
     /**
      * Добавить товар в корзину.
@@ -66,6 +89,18 @@ export class HostConnector {
         } catch (e) { 
             console.log('Error in HostConnector->addProduct() ', e); 
             return(e.response.data);
+        }
+    }
+
+    async delProd(usid, id) {
+        try {
+            const url = this.host + this.api.deleteProduct;
+            const resp = await axios.post(url, {userId: usid, idProduct: id});
+            return resp.data;
+
+        } catch (e) { 
+            console.log('Error in HostConnector->delProd() ', e); 
+            return [];
         }
     }
 

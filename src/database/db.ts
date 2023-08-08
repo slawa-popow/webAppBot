@@ -24,9 +24,15 @@ class Db {
     }
 
     // добавить в корзину
-    async addToBasket(addProd: ReqAddToBasket): Promise<Product[] | ErrorInsertInto> {
-        const result = await this.client.addToBasket(addProd);
+    async addToBasket(usid: string, addProds: {[key: string]: number}): Promise<Product[] | ErrorInsertInto> { 
+        const result = await this.client.addToBasket(usid, addProds);
        
+        return result;
+    }
+
+
+    async delProduct(userId: string, idProduct: string): Promise<Product[]> {
+        const result = await this.client.deleteProduct(userId, idProduct);
         return result;
     }
 

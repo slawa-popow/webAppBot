@@ -6,6 +6,8 @@ export class BasketMan {
         this.hc = hostConnector;
         this.vapee = null;
         this.userBasket = [];
+        this.userCart = {};
+        this.usid = null;
     }
 
     operatiopWithProdusts(result) {
@@ -14,21 +16,51 @@ export class BasketMan {
             this.userBasket.push(...result);
             return this.userBasket;
         } 
-        return result;
+        return this.userBasket;
     }
 
 
     async removeProduct(userId, id) { 
-        const result = await this.hc.removeProduct(userId, id);
-        return this.operatiopWithProdusts(result);
+        this.usid = userId;
+        if (this.userCart) {
+            if (!this.userCart.hasOwnProperty(id)) {
+                this.userCart[id] = 1;
+            } else {
+                if (+this.userCart[id] - 1 === 0) {
+                    delete this.userCart[id]
+                } else {
+                    this.userCart[id] = +this.userCart[id] - 1; 
+                } 
+            }
+
+        }
+        
     }
 
 
     async addProduct(userId, id) {
-        const result = await this.hc.addProduct(userId, id);
+        this.usid = userId;
+        if (this.userCart) {
+            if (!this.userCart.hasOwnProperty(id)) {
+                this.userCart[id] = 1;
+            } else {
+                this.userCart[id] = +this.userCart[id] + 1; 
+            }
+        }
+    }
+
+    async fillBasket() {
+        const result = await this.hc.fillBasket(this.usid, this.userCart);
         return this.operatiopWithProdusts(result);
     }
 
+    async getBasket(userId) {
+        const result = await this.hc.getBasket(userId);
+        return result;
+    }
 
+    async delProduct(userId, idProduct) {
+        return await this.hc.delProd(userId, idProduct);
+    }
 
 }

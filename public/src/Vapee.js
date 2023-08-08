@@ -25,6 +25,7 @@ export class Vapee {
         const userId = await this.getUsId();
         if (userId) {
             this.userId = userId;
+            this.basketMan.usid = this.userId;
             const tenProd = await this.stockMan.getTenProducts();
             this.ticketMan.setData(tenProd);
             await this.ticketMan.viewStartProducts();
