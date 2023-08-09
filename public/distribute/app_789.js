@@ -820,7 +820,7 @@ class TicketMan {
                             <p class='title'>${v['наименование'] || ''}</p>
                             <p class="title">В наличии:</p>
                             <p class="subtitle">${count_on_stock}</p>
-                            <p class="subtitle, subtitle-chars">${v['характеристики']}</p>
+                            
                         </div>
                         
                     </div>
