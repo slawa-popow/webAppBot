@@ -30,7 +30,7 @@ class MainController {
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
         const initData = request.body.initData;
-        console.log(initData);
+        console.log('initdata: ', initData);
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
@@ -43,7 +43,7 @@ class MainController {
         const allCategory = await db.getAllCategory();
         return response.status(200).json(allCategory);
     }
-
+ 
     async getCalculate(request: Request, response: Response) {
         const id = request.body.userId || null;
         if (id) {

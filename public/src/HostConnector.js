@@ -36,10 +36,10 @@ export class HostConnector {
     /**
      * Получить айди (корзину) юзера
      */
-    async getUserId(initData) {
+    async getUserId(initdata) {
         try {
             const url =  this.host + this.api.getUsId;
-            const resp = await axios.post(url, {initData: initData});
+            const resp = await axios.post(url, {initData: initdata});
             
             return resp.data;
         } catch (e) {
