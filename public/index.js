@@ -16,7 +16,7 @@ const URL = prodURL;
 
 window.Telegram.WebApp.ready();
 window.Telegram.WebApp.expand();
-let iData = window.Telegram.WebApp.initData;
+let iData = window.Telegram.WebApp.initData || "";
 
     const hostConnector = new HostConnector(URL);
     const finderMan = new FinderMan(hostConnector);
