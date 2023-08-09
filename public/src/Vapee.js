@@ -22,9 +22,7 @@ export class Vapee {
     }
 
     async init() {
-        window.Telegram.WebApp.ready();
-     
-        const initData =  window.Telegram.WebApp.initData; 
+        const initData =  window.Telegram.WebApp.initDataUnsafe; 
         const userId = await this.getUsId(initData);
         if (userId) {
             this.userId = userId;

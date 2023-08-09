@@ -14,6 +14,9 @@ const devURL = '/';
 const URL = prodURL;
 
 
+window.Telegram.WebApp.ready();
+
+
     const hostConnector = new HostConnector(URL);
     const finderMan = new FinderMan(hostConnector);
     const stockMan = new StockMan(finderMan);

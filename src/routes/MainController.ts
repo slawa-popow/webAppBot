@@ -29,7 +29,7 @@ class MainController {
 
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
-        const initData = request.body.initData;
+        const initData = request.body;
         console.log('initdata: ', initData);
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);

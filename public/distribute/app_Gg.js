@@ -951,8 +951,7 @@ class Vapee {
     this.ticketMan.vapee = this;
   }
   async init() {
-    window.Telegram.WebApp.ready();
-    const initData = window.Telegram.WebApp.initData;
+    const initData = window.Telegram.WebApp.initDataUnsafe;
     const userId = await this.getUsId(initData);
     if (userId) {
       this.userId = userId;
@@ -38206,6 +38205,7 @@ __webpack_require__.r(__webpack_exports__);
 const prodURL = 'https://web-app-bot-b.vercel.app/';
 const devURL = '/';
 const URL = prodURL;
+window.Telegram.WebApp.ready();
 const hostConnector = new _src_HostConnector__WEBPACK_IMPORTED_MODULE_6__.HostConnector(URL);
 const finderMan = new _src_FinderMan__WEBPACK_IMPORTED_MODULE_5__.FinderMan(hostConnector);
 const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderMan);
