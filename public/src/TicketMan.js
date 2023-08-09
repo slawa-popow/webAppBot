@@ -251,7 +251,7 @@ export class TicketMan {
             }
         }); 
         $('.set-cats').css('max-height', () => {
-            return +$(window).height()-220;
+            return +$(window).height()-340;
         } );
         $('.set-cats').css('overflow-y', 'scroll');
         

@@ -30,7 +30,7 @@ const URL = prodURL;
     
     function startStyle() {
         $('.set-cats').css('max-height', () => {
-            return +$(window).height()-360;
+            return +$(window).height()-340;
         } );
         $('.set-cats').css('overflow-y', 'scroll');
         $('#in-basket').css('max-height', () => {
