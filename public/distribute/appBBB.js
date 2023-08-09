@@ -178,10 +178,12 @@ class HostConnector {
   /**
    * Получить айди (корзину) юзера
    */
-  async getUserId() {
+  async getUserId(initData) {
     try {
       const url = this.host + this.api.getUsId;
-      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {});
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
+        initData: initData
+      });
       return resp.data;
     } catch (e) {
       console.error('Error in HostConnector->getUserId() ', error);
@@ -603,7 +605,7 @@ class TicketMan {
       }
     });
     $('.set-cats').css('max-height', () => {
-      return +$(window).height() - 340;
+      return +$(window).height() - 320;
     });
     $('.set-cats').css('overflow-y', 'scroll');
     $('input[type="checkbox"]').on('change', async e => {
@@ -949,7 +951,8 @@ class Vapee {
     this.ticketMan.vapee = this;
   }
   async init() {
-    const userId = await this.getUsId();
+    const initData = window.Telegram.WebApp.initData;
+    const userId = await this.getUsId(initData);
     if (userId) {
       this.userId = userId;
       this.basketMan.usid = this.userId;
@@ -958,8 +961,8 @@ class Vapee {
       await this.ticketMan.viewStartProducts();
     }
   }
-  async getUsId() {
-    const result = await this.hc.getUserId();
+  async getUsId(initData) {
+    const result = await this.hc.getUserId(initData);
     const usid = result.usid;
     if (usid) {
       if (Array.isArray(result.basket)) {
@@ -38210,7 +38213,7 @@ const ticketMan = new _src_TicketMan__WEBPACK_IMPORTED_MODULE_8__.TicketMan(host
 const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basketMan, ticketMan, hostConnector);
 function startStyle() {
   $('.set-cats').css('max-height', () => {
-    return +$(window).height() - 340;
+    return +$(window).height() - 320;
   });
   $('.set-cats').css('overflow-y', 'scroll');
   $('#in-basket').css('max-height', () => {

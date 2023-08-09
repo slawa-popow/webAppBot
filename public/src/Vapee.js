@@ -22,7 +22,8 @@ export class Vapee {
     }
 
     async init() {
-        const userId = await this.getUsId();
+        const initData =  window.Telegram.WebApp.initData;
+        const userId = await this.getUsId(initData);
         if (userId) {
             this.userId = userId;
             this.basketMan.usid = this.userId;
@@ -32,8 +33,8 @@ export class Vapee {
         }
     }
 
-    async getUsId() {
-        const result = await this.hc.getUserId();
+    async getUsId(initData) {
+        const result = await this.hc.getUserId(initData);
         const usid = result.usid;
         if (usid) {
             if (Array.isArray(result.basket)) {

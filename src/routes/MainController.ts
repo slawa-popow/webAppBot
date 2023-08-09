@@ -23,13 +23,14 @@ class MainController {
         
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('index_GHI', {layout: 'main_GHI'});   
+        return response.status(200).render('index_GHI', {layout: 'main_GHI'});    
     } 
 
 
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
-        
+        const initData = request.body.initData;
+        console.log(initData);
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
