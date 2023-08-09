@@ -99,12 +99,12 @@ class MysqlClient implements SomeDataBase {
             
         } else {
             query = data.searchText.split(' ').map((v) => {
-                return `характеристики LIKE "%${v}%"`
+                return `(характеристики LIKE "%${v}%") OR (наименование LIKE "%${v}%")`
             }).join(' OR ');
         }
         
         try {
-            
+            // console.log(query);
             const qfind = await promCon(`
             SELECT * FROM Товары WHERE (${query}) AND 
             Товары.группы = "${data.category}";

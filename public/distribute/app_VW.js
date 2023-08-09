@@ -38210,7 +38210,7 @@ const ticketMan = new _src_TicketMan__WEBPACK_IMPORTED_MODULE_8__.TicketMan(host
 const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basketMan, ticketMan, hostConnector);
 function startStyle() {
   $('.set-cats').css('max-height', () => {
-    return +$(window).height() - 220;
+    return +$(window).height() - 300;
   });
   $('.set-cats').css('overflow-y', 'scroll');
   $('#in-basket').css('max-height', () => {
