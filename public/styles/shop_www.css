@@ -290,6 +290,7 @@ body {
     margin-bottom: 100px;
   } */
 
+  input[type=text] { text-align: center; }
 
   .ui-accordion .ui-accordion-content {
     padding: 0.8em 1em;
