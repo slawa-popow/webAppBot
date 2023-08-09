@@ -951,6 +951,7 @@ class Vapee {
     this.ticketMan.vapee = this;
   }
   async init() {
+    window.Telegram.WebApp.ready();
     const initData = window.Telegram.WebApp.initData;
     const userId = await this.getUsId(initData);
     if (userId) {
