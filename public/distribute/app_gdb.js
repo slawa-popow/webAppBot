@@ -950,8 +950,7 @@ class Vapee {
     this.basketMan.vapee = this;
     this.ticketMan.vapee = this;
   }
-  async init() {
-    const initData = window.Telegram.WebApp.initDataUnsafe;
+  async init(initData) {
     const userId = await this.getUsId(initData);
     if (userId) {
       this.userId = userId;
@@ -38206,6 +38205,7 @@ const prodURL = 'https://web-app-bot-b.vercel.app/';
 const devURL = '/';
 const URL = prodURL;
 window.Telegram.WebApp.ready();
+let initData = window.Telegram.WebApp.initData;
 const hostConnector = new _src_HostConnector__WEBPACK_IMPORTED_MODULE_6__.HostConnector(URL);
 const finderMan = new _src_FinderMan__WEBPACK_IMPORTED_MODULE_5__.FinderMan(hostConnector);
 const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderMan);
@@ -38222,7 +38222,7 @@ function startStyle() {
   });
   $('#in-basket').css('overflow-y', 'scroll');
 }
-vapee.init();
+vapee.init(initData);
 $('#close').on('click', e => {
   window.Telegram.WebApp.sendData("order-off");
 });

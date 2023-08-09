@@ -15,7 +15,7 @@ const URL = prodURL;
 
 
 window.Telegram.WebApp.ready();
-
+let initData = window.Telegram.WebApp.initData;
 
     const hostConnector = new HostConnector(URL);
     const finderMan = new FinderMan(hostConnector);
@@ -41,7 +41,7 @@ window.Telegram.WebApp.ready();
         });
         $('#in-basket').css('overflow-y', 'scroll');
     }
-    vapee.init(); 
+    vapee.init(initData); 
 
     $('#close').on('click', (e) => { 
         window.Telegram.WebApp.sendData("order-off") 
