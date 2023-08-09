@@ -17,6 +17,6 @@ mainRouter.post('/getCalculate', validUsr, mainController.getCalculate);
 mainRouter.post('/getUsrBasket', validUsr, mainController.getUsrBasket);
 mainRouter.post('/deleteProduct', validUsr, mainController.delProduct);
 //
-// mainRouter.get('/Djiugurda', mainController.fromMySklad); 
+mainRouter.get('/Djiugurda', mainController.fromMySklad); 
 
 export { mainRouter };  

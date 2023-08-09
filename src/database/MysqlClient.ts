@@ -99,8 +99,8 @@ class MysqlClient implements SomeDataBase {
             
         } else {// [hesky, mala]
             query = data.searchText.split(' ').map((v) => {
-                return `(характеристики LIKE "%${v}%") OR (наименование LIKE "%${data.searchText}%") OR (наименование LIKE "%${v}%")`
-            }).join(' OR ');
+                return `(характеристики LIKE "%${v}%") OR (наименование LIKE "%${v}%")`
+            }).join(' AND ');
         }
         
         try {
