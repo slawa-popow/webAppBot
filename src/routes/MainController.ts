@@ -23,7 +23,7 @@ class MainController {
         
         if (request.session)
             request.session.id = id; 
-        return response.status(200).render('index_GHI', {layout: 'main_GHI'});    
+        return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
     } 
 
 
