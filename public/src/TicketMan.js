@@ -139,6 +139,19 @@ export class TicketMan {
         }
     }
 
+    makeTabBasketViewPage(n) {
+        $( "#tabs" ).tabs({collapsible: true, activate: async (e, ui) => {
+            $('.finded-characteristics').css('margin-top', '0');
+            
+            if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
+                const basket = await this.vapee.basketMan.getBasket(this.vapee.userId);
+                await this.viewCars(basket); 
+            }
+        }});
+        $('#tabs').tabs( "option", "active", n );
+    }
+    
+
     async makeTab() {
         
         $( "#tabs" ).tabs({collapsible: true, activate: async (e, ui) => {

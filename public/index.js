@@ -31,7 +31,11 @@ let iData = window.Telegram.WebApp.initData || "";
         ticketMan,
         hostConnector 
     );
-    
+
+    window.vapee = vapee;
+    window.VAPEEHOST = URL;
+    window.JQ = $;
+
     function startStyle() {
         $('.set-cats').css('max-height', () => {
             return +$(window).height()-320;
@@ -52,7 +56,10 @@ let iData = window.Telegram.WebApp.initData || "";
         startStyle();
     });
 
+    
+
     startStyle();
+
     
     
 

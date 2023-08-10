@@ -2,7 +2,7 @@
 
 export class Vapee {
 
-    userId = null;
+    
 
     /**
      * @param {StockMan} stockMan 
@@ -18,9 +18,16 @@ export class Vapee {
         this.stockMan.vapee = this; 
         this.basketMan.vapee = this;
         this.ticketMan.vapee = this;
+        this.userId = null;
         
     }
 
+    async getUSID() {
+        const result = await this.hc.getUserId('');
+        const usid = result.usid;
+        return usid;
+    }
+    
     async init(initData) {
          
         const userId = await this.getUsId(initData);
@@ -40,6 +47,7 @@ export class Vapee {
             if (Array.isArray(result.basket)) {
                 this.basketMan.userBasket.push(...result.basket);
             }
+        
             return usid;
         }
         

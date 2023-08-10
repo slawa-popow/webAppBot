@@ -20,6 +20,22 @@
  
 <body>
     {{{body}}}
-    <script src="distribute/app_w4.js"></script> 
+    <script src="distribute/app_w4.js"></script>
+    <script>
+        
+        async function getId() {
+            return await window.vapee.getUSID();
+        }
+
+        async function loadBasket() {
+            const id = await getId();
+            const ub = await window.vapee.hc.getBasket(id);
+            await window.vapee.ticketMan.viewCars(ub);
+            window.vapee.ticketMan.makeTabBasketViewPage(1);
+        }
+        loadBasket();
+       
+    </script> 
+   
 </body>
 </html>

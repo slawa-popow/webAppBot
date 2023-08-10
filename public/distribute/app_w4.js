@@ -498,6 +498,19 @@ class TicketMan {
       })} руб.`);
     }
   }
+  makeTabBasketViewPage(n) {
+    $("#tabs").tabs({
+      collapsible: true,
+      activate: async (e, ui) => {
+        $('.finded-characteristics').css('margin-top', '0');
+        if (ui.newPanel[0] && ui.newPanel[0].id === 'tabs-3') {
+          const basket = await this.vapee.basketMan.getBasket(this.vapee.userId);
+          await this.viewCars(basket);
+        }
+      }
+    });
+    $('#tabs').tabs("option", "active", n);
+  }
   async makeTab() {
     $("#tabs").tabs({
       collapsible: true,
@@ -933,8 +946,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Vapee: () => (/* binding */ Vapee)
 /* harmony export */ });
 class Vapee {
-  userId = null;
-
   /**
    * @param {StockMan} stockMan 
    * @param {BasketMan} basketMan 
@@ -949,6 +960,12 @@ class Vapee {
     this.stockMan.vapee = this;
     this.basketMan.vapee = this;
     this.ticketMan.vapee = this;
+    this.userId = null;
+  }
+  async getUSID() {
+    const result = await this.hc.getUserId('');
+    const usid = result.usid;
+    return usid;
   }
   async init(initData) {
     const userId = await this.getUsId(initData);
@@ -38213,6 +38230,9 @@ const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderM
 const basketMan = new _src_BasketMan__WEBPACK_IMPORTED_MODULE_7__.BasketMan(hostConnector);
 const ticketMan = new _src_TicketMan__WEBPACK_IMPORTED_MODULE_8__.TicketMan(hostConnector);
 const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basketMan, ticketMan, hostConnector);
+window.vapee = vapee;
+window.VAPEEHOST = URL;
+window.JQ = $;
 function startStyle() {
   $('.set-cats').css('max-height', () => {
     return +$(window).height() - 320;
