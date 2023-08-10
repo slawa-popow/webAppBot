@@ -149,6 +149,10 @@ export class TicketMan {
             }
         }});
         $('#tabs').tabs( "option", "active", n );
+        $('#in-basket').css('max-height', () => {
+            return +$(window).height()-190;
+        });
+        $('#in-basket').css('overflow-y', 'scroll');
     }
     
 

@@ -55,7 +55,7 @@ export class BasketMan {
     }
 
     async getBasket(userId) {
-        const result = await this.hc.getBasket(userId);
+        const result = await this.hc.getBasket(userId); 
         return result;
     }
 
