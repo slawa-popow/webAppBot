@@ -33,7 +33,7 @@ let iData = window.Telegram.WebApp.initData || "";
     );
 
     window.vapee = vapee;
-    window.VAPEEHOST = URL;
+    window.VAPEEHOST = URL; 
     window.JQ = $;
 
     function startStyle() {
