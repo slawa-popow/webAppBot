@@ -38224,7 +38224,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const prodURL = 'https://web-app-bot-b.vercel.app/';
 const devURL = '/';
-const URL = distURL;
+const URL = prodURL;
 window.Telegram.WebApp.ready();
 window.Telegram.WebApp.expand();
 let iData = window.Telegram.WebApp.initData || "";
