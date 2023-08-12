@@ -1,6 +1,7 @@
 
 import { FrontInputData } from './FrontInputData';
 import { AllCategory, ErrorInsertInto, Product } from './Product';
+import { ReportStockQueryDB } from './ReportBalance';
 import { ReqAddToBasket } from './ReqAddToBasket';
 
 
@@ -21,4 +22,5 @@ export interface SomeDataBase {
 
     getUuids(): Promise<Product[]>;
     setImageCount(X: string[][]): Promise<boolean>;
+    writeReportBalance(arrSaveDb: ReportStockQueryDB[]): Promise<boolean>;
 }

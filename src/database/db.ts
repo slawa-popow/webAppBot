@@ -1,5 +1,6 @@
 import { FrontInputData } from "../types/FrontInputData";
 import { AllCategory, ErrorInsertInto, Product } from "../types/Product";
+import { ReportStockQueryDB } from "../types/ReportBalance";
 import { ReqAddToBasket } from "../types/ReqAddToBasket";
 import { SomeDataBase } from "../types/SomeDataBase";
 import { mysqlClient } from "./MysqlClient";
@@ -80,6 +81,10 @@ class Db {
     async setImageCount(X: string[][]): Promise<boolean> {
         const res = await this.client.setImageCount(X);
         return res;
+    }
+
+    async writeReportBalance(arrSaveDb: ReportStockQueryDB[]): Promise<boolean> {
+        return await this.client.writeReportBalance(arrSaveDb);
     }
 
 }

@@ -6,6 +6,8 @@ import { getImgSrcFromMySklad } from '../utils/getImgSrcFromMySklad';
 import { ResultFromMySklad } from '../types/ResultFromMySklad';
 import { ReqAddToBasket } from '../types/ReqAddToBasket';
 import { FrontInputData } from '../types/FrontInputData';
+import { getAllBalanceReport } from '../utils/getAllBalanceReport';
+import { ReportBalance, ReportStockQueryDB } from '../types/ReportBalance';
 // import { CountAndImage } from '../types/CountAndImage';
 
 interface ResultAllProds {
@@ -141,6 +143,50 @@ class MainController {
     }
 
     // ------------------------- ------------- ---------------- --------------------------------------
+
+    async getAllOnStock(_request: Request, response: Response) {
+        const result: ReportBalance[]  = await getAllBalanceReport();
+        const arrSaveDb: ReportStockQueryDB[] = [];
+
+        if (Array.isArray(result) && result.length > 0) {
+            for (let data of result) {
+                const report: ReportStockQueryDB = {
+                    stock : 0,              // Остаток
+                    inTransit: 0,           // Ожидание
+                    reserve : 0,            // Резерв
+                    quantity : 0,           // Доступно
+                    name : '',              // Наименование
+                    code : '',              // Код
+                    price : 0,              // Себестоимость
+                    salePrice : 0,          // Цена_продажи
+                    externalCode : '',      // Внешний_код 
+                    stockDays: 0,           // Дней_на_складе
+                    image: ''               // Изображение_товара
+                };
+
+                report.stock = data.stock || 0;
+                report.inTransit = data.inTransit || 0;
+                report.reserve = data.reserve || 0;
+                report.quantity = data.quantity || 0;
+                report.name = data.name || '';
+                report.code = data.code || '';
+                report.price = (data.price) ? data.price : 0.0;
+                report.salePrice = (data.salePrice) ? data.salePrice : 0.0;
+                report.externalCode = data.externalCode || '';
+                report.stockDays = data.stockDays || 0;
+                report.image = (data.image && data.image.miniature && data.image.miniature.downloadHref) ?
+                                data.image.miniature.downloadHref : ''; 
+
+                arrSaveDb.push(report);
+            }
+        }
+        
+        const respDb = await db.writeReportBalance(arrSaveDb);
+        if (respDb) {
+            return response.status(200).send('<h1 style="color: green;">Сделано.</h1>');
+        }
+        return response.status(400).send('<h1 style="color: red;">Была ошибка.</h1>');
+    }
 
     async fromMySklad(_request: Request, response: Response) {
         const uuids = await db.getUuids();

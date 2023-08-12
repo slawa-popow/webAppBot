@@ -10,11 +10,11 @@ import { OkPacket } from "../types/OkPacket";
 import { StatusOrder } from "../types/StatusOrder";
 import { CatsHaracters } from "../types/CatsHaracters";
 import { FrontInputData } from "../types/FrontInputData";
+import { ReportStockQueryDB } from "../types/ReportBalance";
 // import { OkPacket } from '../types/OkPacket'
 
 interface Tables {
-    products: string;
-    allprods: string;
+   [key: string] : string;
 };
 
 dotenv.config();
@@ -26,7 +26,7 @@ class MysqlClient implements SomeDataBase {
     private DATABASE: string = process.env.DATABASE || '';
     private PASSWORD: string = process.env.PASSWORD || '';
     private protected: Pool | null = null;
-    table: Tables = {products: 'products_1', allprods: 'Товары'};
+    table: Tables = {products: 'products_1', allprods: 'Товары', ostatki: 'Остатки'};
 
     constructor() {
         this.initPool();
@@ -397,6 +397,48 @@ class MysqlClient implements SomeDataBase {
         }
         return [];
     }
+
+    async writeReportBalance(arrSaveDb: ReportStockQueryDB[]): Promise<boolean> {
+        const connect = await this.getConnectionPool();
+        const promCon = promisify(connect.query).bind(connect);
+
+        try {
+            await promCon(`
+                    CREATE TABLE IF NOT EXISTS ${this.DATABASE}.${this.table.ostatki}
+                    ( 
+                        id INT NOT NULL AUTO_INCREMENT ,
+                        Остаток INT NOT NULL ,
+                        Ожидание INT NOT NULL ,
+                        Резерв INT NOT NULL ,
+                        Доступно INT NOT NULL,
+                        Наименование TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                        Код TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                        Себестоимость DOUBLE NOT NULL,
+                        Цена_продажи DOUBLE NOT NULL,
+                        Внешний_код TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                        Дней_на_складе INT NOT NULL,
+                        Изображение_товара TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                        PRIMARY KEY  (id)
+                    ) ENGINE = InnoDB;
+                `);
+
+                for (let q of arrSaveDb) {
+                    await promCon(`
+                        INSERT INTO ${this.table.ostatki} (Остаток, Ожидание, Резерв, Доступно, Наименование, Код, Себестоимость, Цена_продажи, Внешний_код, Дней_на_складе, Изображение_товара)
+                        VALUES ("${q.stock}", "${q.inTransit}", "${q.reserve}", "${q.quantity}", "${q.name}", "${q.code}", "${q.price}", "${q.salePrice}", "${q.externalCode}", "${q.stockDays}", "${q.image}");
+                    `);
+                }
+
+                return true;
+
+        } catch (e) { console.log('Error in MysqlClient->writeReportBalance()->catch', e) }
+        finally {
+            connect.release();
+        }
+        return false;
+    }
+
+
 
     async setImageCount(X: string[][]): Promise<boolean> {
         const connect = await this.getConnectionPool();
