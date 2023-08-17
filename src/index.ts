@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(cors({credentials: true}));
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars'); 
-app.set('views', __dirname + '/../views');
+app.set('views', __dirname + '/../views'); 
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true})); 
