@@ -11,7 +11,7 @@ import { TicketMan } from "./src/TicketMan";
 
 const prodURL = 'https://web-app-bot-b.vercel.app/' 
 const devURL = '/';
-const URL = prodURL;
+const URL = prodURL; 
 
 
 window.Telegram.WebApp.ready();
