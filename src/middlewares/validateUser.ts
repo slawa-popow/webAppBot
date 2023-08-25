@@ -9,6 +9,7 @@ export async function validateUser(request: Request, response: Response, next: N
         const id = requery.usid as string;
         const validUser = await db.isRealUser(id);
         if (validUser) {
+            request.session!.id = id;
             return next();     
         }
     }
