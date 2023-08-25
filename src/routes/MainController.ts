@@ -32,16 +32,17 @@ class MainController {
         
         const id = requery.usid;
         
-        if (request.session)
+        if (request.session && id){
             request.session.id = id; 
-        return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
+            return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
+        }
+        return response.status(415).send('err')
     } 
 
 
     async getUserId(request: Request, response: Response) { 
         const id: string = request.session!.id;
-        const initData = request.body;
-        console.log('initdata: ', initData);
+        
         if (id) {
             const basket: Product[] = await db.getBasketInfo(id);
             return response.status(200).json({usid: id, basket: [...basket]});
@@ -97,7 +98,7 @@ class MainController {
     }
 
     async delProduct(request: Request, response: Response) {
-        console.log(request.body); 
+          
         const prodInfo = request.body;
         if (prodInfo.userId && prodInfo.idProduct) {
             const result = await db.delProduct(prodInfo.userId, prodInfo.idProduct);
