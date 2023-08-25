@@ -178,12 +178,10 @@ class HostConnector {
   /**
    * Получить айди (корзину) юзера
    */
-  async getUserId(initdata) {
+  async getUserId() {
     try {
       const url = this.host + this.api.getUsId;
-      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {
-        initData: initdata
-      });
+      const resp = await axios__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, {});
       return resp.data;
     } catch (e) {
       console.error('Error in HostConnector->getUserId() ', error);
@@ -971,8 +969,8 @@ class Vapee {
     const usid = result.usid;
     return usid;
   }
-  async init(initData) {
-    const userId = await this.getUsId(initData);
+  async init() {
+    const userId = await this.getUsId();
     if (userId) {
       this.userId = userId;
       this.basketMan.usid = this.userId;
@@ -981,8 +979,8 @@ class Vapee {
       await this.ticketMan.viewStartProducts();
     }
   }
-  async getUsId(initData) {
-    const result = await this.hc.getUserId(initData);
+  async getUsId() {
+    const result = await this.hc.getUserId();
     const usid = result.usid;
     if (usid) {
       if (Array.isArray(result.basket)) {
@@ -38227,16 +38225,12 @@ const devURL = '/';
 const URL = prodURL;
 window.Telegram.WebApp.ready();
 window.Telegram.WebApp.expand();
-let iData = window.Telegram.WebApp.initData || "";
 const hostConnector = new _src_HostConnector__WEBPACK_IMPORTED_MODULE_6__.HostConnector(URL);
 const finderMan = new _src_FinderMan__WEBPACK_IMPORTED_MODULE_5__.FinderMan(hostConnector);
 const stockMan = new _src_StockMan__WEBPACK_IMPORTED_MODULE_4__.StockMan(finderMan);
 const basketMan = new _src_BasketMan__WEBPACK_IMPORTED_MODULE_7__.BasketMan(hostConnector);
 const ticketMan = new _src_TicketMan__WEBPACK_IMPORTED_MODULE_8__.TicketMan(hostConnector);
 const vapee = new _src_Vapee__WEBPACK_IMPORTED_MODULE_3__.Vapee(stockMan, basketMan, ticketMan, hostConnector);
-window.vapee = vapee;
-window.VAPEEHOST = URL;
-window.JQ = $;
 function startStyle() {
   $('.set-cats').css('max-height', () => {
     return +$(window).height() - 320;
@@ -38247,7 +38241,7 @@ function startStyle() {
   });
   $('#in-basket').css('overflow-y', 'scroll');
 }
-vapee.init(iData);
+vapee.init();
 $('#close').on('click', e => {
   window.Telegram.WebApp.sendData("order-off");
 });
@@ -38261,4 +38255,3 @@ startStyle();
 
 /******/ })()
 ;
-//# sourceMappingURL=app.js.map

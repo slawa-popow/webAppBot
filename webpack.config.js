@@ -23,7 +23,7 @@ module.exports = {
   // mode: 'production',
   mode: 'development',
   watch: true,
-  devtool: 'source-map',
+  devtool: 'hidden-source-map',
   module: {
     rules: [
       {

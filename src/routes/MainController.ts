@@ -28,15 +28,11 @@ class MainController {
     }
 
     async getIndexPage(request: Request, response: Response) {
-        const requery = request.query;
-        
-        const id = requery.usid;
-        
-        if (request.session && id){
-            request.session.id = id; 
+         
+        if (request.session && request.session.id){ 
             return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
         }
-        return response.status(415).send('err')
+        return response.status(415).send('перезапусти бота')
     } 
 
 

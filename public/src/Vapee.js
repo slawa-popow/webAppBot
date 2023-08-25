@@ -28,9 +28,9 @@ export class Vapee {
         return usid;
     }
     
-    async init(initData) {
+    async init() {
          
-        const userId = await this.getUsId(initData);
+        const userId = await this.getUsId();
         if (userId) {
             this.userId = userId;
             this.basketMan.usid = this.userId;
@@ -40,8 +40,8 @@ export class Vapee {
         }
     }
 
-    async getUsId(initData) {
-        const result = await this.hc.getUserId(initData);
+    async getUsId() {
+        const result = await this.hc.getUserId();
         const usid = result.usid;
         if (usid) {
             if (Array.isArray(result.basket)) {

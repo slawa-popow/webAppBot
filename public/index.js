@@ -9,14 +9,13 @@ import { HostConnector } from "./src/HostConnector";
 import { BasketMan } from "./src/BasketMan";
 import { TicketMan } from "./src/TicketMan";
 
-const prodURL = 'https://web-app-bot-b.vercel.app/' 
+const prodURL = 'https://web-app-bot-b.vercel.app/'   
 const devURL = '/';
 const URL = prodURL; 
 
 
 window.Telegram.WebApp.ready();
 window.Telegram.WebApp.expand();
-let iData = window.Telegram.WebApp.initData || "";
 
     const hostConnector = new HostConnector(URL);
     const finderMan = new FinderMan(hostConnector);
@@ -32,9 +31,6 @@ let iData = window.Telegram.WebApp.initData || "";
         hostConnector 
     );
 
-    window.vapee = vapee;
-    window.VAPEEHOST = URL; 
-    window.JQ = $;
 
     function startStyle() {
         $('.set-cats').css('max-height', () => {
@@ -46,7 +42,7 @@ let iData = window.Telegram.WebApp.initData || "";
         });
         $('#in-basket').css('overflow-y', 'scroll');
     }
-    vapee.init(iData); 
+    vapee.init(); 
 
     $('#close').on('click', (e) => { 
         window.Telegram.WebApp.sendData("order-off") 

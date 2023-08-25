@@ -17,7 +17,7 @@ export async function validateUser(request: Request, response: Response, next: N
 
 
 export async function validUsr(request: Request, response: Response, next: NextFunction) {
-    console.log('valid post session.id: ', request.session!.id) 
+    
     if (request.session) {
         const id = request.session.id;
         const validUser = await db.isRealUser(id); 
