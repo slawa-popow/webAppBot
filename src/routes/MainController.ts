@@ -32,7 +32,7 @@ class MainController {
         if (request.session && request.session.id){ 
             return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
         }
-        return response.status(415).send('перезапусти бота')
+        return response.status(415).send('перезапусти бота') 
     } 
 
 
