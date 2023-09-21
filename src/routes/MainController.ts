@@ -18,21 +18,21 @@ interface ResultAllProds {
 
 class MainController {
 
-    async getBasketPage(_request: Request, response: Response) {
-       
-        
-        
+    async getBasketPage(request: Request, response: Response) {
+        const requery = request.query;
+        const id = requery.usid;
+        if (request.session && request.session.id === id) {
             return response.status(200).render('basketIndex', {layout: 'basket'});
-        
-        
+        }
+        return response.status(400).json({error: "Корзина очищена", message: "Ваша корзина была очищена по таймеру. Пожалуйста, перейдите в телеграм и запустите бота."});
     }
 
-    async getIndexPage(_request: Request, response: Response) {
+    async getIndexPage(request: Request, response: Response) {
          
-         
+        if (request.session && request.session.id){ 
             return response.status(200).render('index_yyy', {layout: 'main_yyy'});    
-        
-        
+        }
+        return response.status(415).send('перезапусти бота') 
     } 
 
 
